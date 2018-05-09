@@ -78,3 +78,6 @@ cpp/client/sample-producer\.cfg
 cpp/client/test-freeculture\.cfg
 cpp/contrib
 cpp/ndnrtc-client
+.idea
+cmake-build-debug
+CMakeLists.txt
