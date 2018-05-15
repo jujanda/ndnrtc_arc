@@ -5,6 +5,7 @@
 #ifndef NDNRTC_ARC_ARC_HPP
 #define NDNRTC_ARC_ARC_HPP
 
+
 namespace ndnrtc{
     /*
      * TODO: Write description
@@ -12,14 +13,19 @@ namespace ndnrtc{
     class Arc
     {
     public:
-        Arc(int initialValue = 42);
-
-        int getValue() const;
-        void setValue(int value);
+        Arc(short adaptionLogic = 0);
+        short noAdaption();
+        short dashJS ();
+        short thang ();
+        short getAdaptionLogic();
         void write();
 
+        static const short NO_ADAPTION = 0;
+        static const short DASH_JS = 1;
+        static const short THANG = 2;
+
     private:
-        int privateValue;
+        short adaptionLogic = 0;
     };
 }
 
