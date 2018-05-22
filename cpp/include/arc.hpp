@@ -6,6 +6,9 @@
 #define NDNRTC_ARC_ARC_HPP
 
 
+#include <string>
+#include <vector>
+
 namespace ndnrtc{
     /*
      * TODO: Write description
@@ -13,19 +16,21 @@ namespace ndnrtc{
     class Arc
     {
     public:
-        Arc(short adaptionLogic = 0);
-        short noAdaption();
-        short dashJS ();
-        short thang ();
-        short getAdaptionLogic();
+        Arc(int adaptionLogic = 0);
+        int getSelectedAdaptionLogic();
         void write();
 
-        static const short NO_ADAPTION = 0;
-        static const short DASH_JS = 1;
-        static const short THANG = 2;
+        std::vector<std::string> threadNames;
+
+        static const int AL_NO_ADAPTION = 0;
+        static const int AL_DASH_JS = 1;
+        static const int AL_THANG = 2;
 
     private:
-        short adaptionLogic = 0;
+        int selectedAdaptionLogic = 0;
+        std::string noAdaption();
+        std::string dashJS ();
+        std::string thang ();
     };
 }
 
