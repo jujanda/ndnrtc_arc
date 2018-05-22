@@ -5,8 +5,7 @@
 #include <iostream>
 #include <boost/asio/io_service.hpp>
 #include <local-stream.hpp>
-
-#include "../include/arc.hpp" //TODO: Write proper imports.
+#include <arc.hpp>
 
 using namespace ndnrtc;
 
