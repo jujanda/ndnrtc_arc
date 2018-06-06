@@ -11,7 +11,6 @@
 #include <ndn-cpp/security/identity/memory-private-key-storage.hpp>
 #include <ndn-cpp/security/identity/memory-identity-storage.hpp>
 #include <ndn-cpp/security/policy/no-verify-policy-manager.hpp>
-#include <ndnrtc/arc.hpp>
 
 #include "client.hpp"
 #include "config.hpp"

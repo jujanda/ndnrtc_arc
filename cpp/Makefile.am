@@ -1,9 +1,9 @@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -I m4
 
-pkginclude_HEADERS = include/ndnrtc-common.hpp include/params.hpp include/statistics.hpp include/interfaces.hpp include/name-components.hpp include/error-codes.hpp include/ndnrtc-defines.hpp include/simple-log.hpp include/stream.hpp include/local-stream.hpp include/remote-stream.hpp include/arc.hpp
+pkginclude_HEADERS = include/ndnrtc-common.hpp include/params.hpp include/statistics.hpp include/interfaces.hpp include/name-components.hpp include/error-codes.hpp include/ndnrtc-defines.hpp include/simple-log.hpp include/stream.hpp include/local-stream.hpp include/remote-stream.hpp
 
 lib_LTLIBRARIES = libndnrtc.la
-libndnrtc_la_SOURCES = src/arc.cpp include/arc.hpp \
+libndnrtc_la_SOURCES = src/arc.cpp src/arc.hpp \
   src/async.cpp src/async.hpp \
   src/audio-capturer.cpp src/audio-capturer.hpp \
   src/audio-controller.cpp src/audio-controller.hpp \
