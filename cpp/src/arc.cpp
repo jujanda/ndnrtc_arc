@@ -128,11 +128,12 @@ void Arc::write()
 
 std::string Arc::noAdaption() {
     // TODO delete randomizer (only used for testing)
-    int min = 0;
+/*    int min = 0;
     int max = videoThreads.size() -1;
     int randNum = min + (rand() % static_cast<int>(max - min + 1));
-    threadToFetch = videoThreads[randNum].threadName;
-//    std::cout << "No adaption performed." << std::endl;
+    threadToFetch = videoThreads[randNum].threadName;*/
+
+    // Do nothing
     return threadToFetch;
 }
 
