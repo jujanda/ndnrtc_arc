@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "segment-controller.hpp"
 
 namespace ndnrtc{
@@ -21,6 +22,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver
         Arc(int adaptionLogic = 0);
         std::string calculateThreadToFetch();
         int getSelectedAdaptionLogic();
+        void addSentInterest(std::string name);
         void write();
 
         // TODO Should videoThread vector & structs be private?
@@ -35,7 +37,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver
         };
         std::vector<videoThread> videoThreads;
 
-        // TODO solve this with 'typdef enum'?
+    // TODO solve this with 'typdef enum'?
         static const int AL_NO_ADAPTION = 0;
         static const int AL_DASH_JS = 1;
         static const int AL_THANG = 2;
@@ -43,6 +45,9 @@ class Arc : public ndnrtc::ISegmentControllerObserver
     private:
         int selectedAdaptionLogic = 0;
         std::string threadToFetch;
+        std::unordered_map<std::string, double> sentInterests;
+        int counter = 0; // TODO delete this after debugging
+        double dashJS_lastSegmentMeasuredThroughput = -1; // TODO move this into DASH-JS class
         double dashJS_lastSegmentCalculatedThroughput = 0; // TODO move this into DASH-JS class
 
         // ISegmentControllerObserver methods:
