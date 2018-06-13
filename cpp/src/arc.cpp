@@ -13,8 +13,11 @@
 
 using namespace ndnrtc;
 
-Arc::Arc(int adaptionLogic) :
-        selectedAdaptionLogic(adaptionLogic)
+Arc::Arc(AdaptionLogic adaptionLogic,
+         RemoteStreamImpl* pimpl,
+         boost::shared_ptr<statistics::StatisticsStorage> &storage)
+        : selectedAdaptionLogic(adaptionLogic),
+          sstorage_(storage)
 {
     // TODO write about observing in description
     // TODO pass video thread data through config file params instead
@@ -30,23 +33,23 @@ Arc::Arc(int adaptionLogic) :
     videoThreads.emplace_back(rep2);
     videoThreads.emplace_back(rep3);
 
-    // TODO set threadToFetch dynamically
-    threadToFetch = videoThreads.begin()->threadName;
+    threadToFetch = videoThreads.begin()->threadName; // TODO set initial threadToFetch dynamically
 }
+
+Arc::~Arc() = default;
 
 std::string Arc::calculateThreadToFetch() {
     switch (getSelectedAdaptionLogic()) {
-        case AL_NO_ADAPTION: threadToFetch = noAdaption(); break;
-        case AL_DASH_JS: threadToFetch = dashJS(); break;
-        case AL_THANG: threadToFetch = thang(); break;
-        default: threadToFetch = noAdaption();
+        case AdaptionLogic::NoAdaption: threadToFetch = noAdaption(); break;
+        case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
+        case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
-//    std::cout << "New threadToFetch = " << threadToFetch << std::endl;
-
+    std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
+    pimpl->setThread(threadToFetch);
     return threadToFetch;
 }
 
-int Arc::getSelectedAdaptionLogic() {
+AdaptionLogic Arc::getSelectedAdaptionLogic() {
     return selectedAdaptionLogic;
 }
 
@@ -54,13 +57,17 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
     if(wireSeg->isPacketHeaderSegment() && wireSeg->getSampleClass() == SampleClass::Key) {
         // TODO only use info from video segments
+        // TODO Find new way to measure throughput (maybe with statistics?)
+        // TODO ========================== START HERE NET TIME ==========================
+//        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
+
         double prodTime;
         std::string name = wireSeg->getData()->getName().toUri();
         auto search = sentInterests.find(name);
         if(search != sentInterests.end()) {
             prodTime = search->second;
         } else {
-            std::cout << "Interest not found in map." << std::endl;
+//            std::cout << "Interest not found in map." << std::endl;
         }
 
         double now = ndn_getNowMilliseconds();
@@ -71,10 +78,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         dashJS_lastSegmentMeasuredThroughput = size / rtt;
 
 //        std::cout << "pT = " << prodTime;
-//        std::cout << ", pT2 = " << prodTime2;
-//        std::cout << ", pT3 = " << prodTime3;
 //        std::cout << ", cT = " << now;
-//        std::cout << ", cT2 = " << now2;
 //        std::cout << ", size = " << size << " bit";
 //        std::cout << ", size = " << size2 << " bit";
 //        std::cout << ", rtt = " << rtt;
@@ -102,29 +106,6 @@ void Arc::addSentInterest(std::string name) {
     sentInterests.insert(std::make_pair(name, ndn_getNowMilliseconds()));
 }
 
-void Arc::write()
-{
-    // TODO Implement additional info to be written
-    // TODO Integrate messages into logging
-    std::cout << "Offered Adaption Logics: " << std::endl;
-    std::cout << "NO_ADAPTION = " << AL_NO_ADAPTION << std::endl;
-    std::cout << "DASH_JS = " << AL_DASH_JS << std::endl;
-    std::cout << "THANG = " << AL_THANG << std::endl;
-
-    std::cout << "Chosen Adaption Logic =  " << getSelectedAdaptionLogic() << std::endl;
-
-    std::cout << "Registered representations:" << std::endl;
-    if (!videoThreads.empty()) {
-        for(std::vector<std::string>::size_type i = 0; i != videoThreads.size(); i++) {
-            std::cout << "[" << i << "]: " << videoThreads[i].threadName << std::endl;
-        }
-    } else {
-        std::cout << "No representations found." << std::endl;
-    }
-
-    std::cout << "Current thread to fetch: " << threadToFetch << std::endl;
-
-}
 
 std::string Arc::noAdaption() {
     // TODO delete randomizer (only used for testing)
@@ -153,7 +134,7 @@ std::string Arc::dashJS() {
 
 //    std::cout << "nextbn = " << nextBn; // TODO delete (only used for testing)
 //    std::cout << "   bn = " << bn; // TODO delete (only used for testing)
-//    std::cout << "   bm = " << bm; TODO delete (only used for testing)
+//    std::cout << "   bm = " << bm; // TODO delete (only used for testing)
 //    std::cout << std::endl; // TODO delete (only used for testing)
 
     // Rate selection
