@@ -50,6 +50,7 @@ namespace ndnrtc {
                         OnTimeout onTimeout,
                         OnNetworkNack onNetworkNack) = 0;
         virtual void reset() = 0;
+        virtual void registerObserver(IInterestQueueObserver *observer) = 0;
     };
 
     /**

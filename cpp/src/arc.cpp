@@ -44,8 +44,8 @@ std::string Arc::calculateThreadToFetch() {
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
-    std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
-    pimpl->setThread(threadToFetch);
+//    std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
+//    pimpl->setThread(threadToFetch);
     return threadToFetch;
 }
 
@@ -53,12 +53,14 @@ AdaptionLogic Arc::getSelectedAdaptionLogic() {
     return selectedAdaptionLogic;
 }
 
+void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & interest) {
+    sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
+}
+
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
     if(wireSeg->isPacketHeaderSegment() && wireSeg->getSampleClass() == SampleClass::Key) {
         // TODO only use info from video segments
-        // TODO Find new way to measure throughput (maybe with statistics?)
-        // TODO ========================== START HERE NET TIME ==========================
 //        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
 
         double prodTime;
@@ -67,15 +69,15 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         if(search != sentInterests.end()) {
             prodTime = search->second;
         } else {
-//            std::cout << "Interest not found in map." << std::endl;
+            std::cout << "Interest not found in map." << std::endl;
         }
 
         double now = ndn_getNowMilliseconds();
 
         double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s
-        long size = wireSeg->getData()->getContent().size() * 8;
-        long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8; // TODO is this better for size?
-        dashJS_lastSegmentMeasuredThroughput = size / rtt;
+        long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
+        long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
+        dashJS_lastSegmentMeasuredThroughput = size / rtt; // bit/s
 
 //        std::cout << "pT = " << prodTime;
 //        std::cout << ", cT = " << now;
@@ -84,28 +86,9 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 //        std::cout << ", rtt = " << rtt;
 //        std::cout << ", throughput = " << dashJS_lastSegmentMeasuredThroughput;
 //        std::cout << std::endl;
+        calculateThreadToFetch();
     }
 }
-
-/*void segmentRequestTimeout(const NamespaceInfo&) {
-    std::cout << "segmentRequestTimeout" << std::endl;
-
-}
-
-void segmentNack(const NamespaceInfo&, int reason) {
-    std::cout << "segmentNack" << std::endl;
-
-}
-
-void segmentStarvation() {
-    std::cout << "segmentStarvation" << std::endl;
-
-};*/
-
-void Arc::addSentInterest(std::string name) {
-    sentInterests.insert(std::make_pair(name, ndn_getNowMilliseconds()));
-}
-
 
 std::string Arc::noAdaption() {
     // TODO delete randomizer (only used for testing)

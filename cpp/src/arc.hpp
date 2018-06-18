@@ -12,6 +12,7 @@
 #include <boost/thread.hpp>
 #include "segment-controller.hpp"
 #include "remote-stream-impl.hpp"
+#include "interest-queue.hpp"
 
 namespace ndnrtc{
 
@@ -25,7 +26,7 @@ namespace ndnrtc{
      * TODO: Write description
      * ARC assumes that representations are given in an ordered list, sorted by quality in ascending order
      */
-class Arc : public ndnrtc::ISegmentControllerObserver
+class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQueueObserver
     {
     public:
         Arc(AdaptionLogic adaptionLogic,
@@ -35,7 +36,6 @@ class Arc : public ndnrtc::ISegmentControllerObserver
 
         std::string calculateThreadToFetch();
         AdaptionLogic getSelectedAdaptionLogic();
-        void addSentInterest(std::string name);
 
         // TODO Should videoThread vector & structs be private?
         struct videoThread {
@@ -60,6 +60,9 @@ class Arc : public ndnrtc::ISegmentControllerObserver
         int counter = 0; // TODO delete this after debugging
         double dashJS_lastSegmentMeasuredThroughput = -1; // TODO move this into DASH-JS class
         double dashJS_lastSegmentCalculatedThroughput = 0; // TODO move this into DASH-JS class
+
+        // IInterestQueueObserver method
+        void onInterestIssued(const boost::shared_ptr<const ndn::Interest>&) override;
 
         // ISegmentControllerObserver methods:
         void segmentArrived(const boost::shared_ptr<WireSegment>&) override;
