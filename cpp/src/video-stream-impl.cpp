@@ -200,6 +200,10 @@ bool VideoStreamImpl::feedFrame(const WebRtcVideoFrame &frame)
 
         (*statStorage_)[Indicator::DroppedNum] += (threads_.size() - frames.size());
         bool result = false;
+        LogWarnC << "DroppedNum = " << (*statStorage_)[Indicator::DroppedNum]
+                 << "\t thread.size() = " << threads_.size()
+                 << "\t frames.size() = " << frames.size()
+                 << std::endl;
 
         if (frames.size())
         {

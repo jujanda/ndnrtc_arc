@@ -67,7 +67,7 @@ RemoteStreamImpl::RemoteStreamImpl(asio::io_service &io,
     bufferControl_ = make_shared<BufferControl>(drdEstimator, buffer_, sstorage_);
     latencyControl_ = make_shared<LatencyControl>(1000, drdEstimator, sstorage_);
     interestControl_ = make_shared<InterestControl>(drdEstimator, sstorage_);
-    arc_ = make_shared<Arc>(AdaptionLogic::Dash_JS, this, sstorage_);
+//    arc_ = make_shared<Arc>(AdaptionLogic::Dash_JS, this, sstorage_); // TODO set AL dynamically (config file)
 
     // pipeliner and pipeline control created in subclasses
 

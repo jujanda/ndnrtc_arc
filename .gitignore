@@ -80,4 +80,3 @@ cpp/contrib
 cpp/ndnrtc-client
 .idea
 cmake-build-debug
-CMakeLists.txt

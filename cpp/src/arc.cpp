@@ -20,6 +20,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
           sstorage_(storage)
 {
     // TODO write about observing in description
+    // TODO Check out 'rate-adaption-module.hpp' for hints
     // TODO pass video thread data through config file params instead
     // TODO Check if info is delivered in meta data.
     videoThread rep1, rep2, rep3;
@@ -32,6 +33,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     videoThreads.emplace_back(rep1);
     videoThreads.emplace_back(rep2);
     videoThreads.emplace_back(rep3);
+    this->pimpl = pimpl;
 
     threadToFetch = videoThreads.begin()->threadName; // TODO set initial threadToFetch dynamically
 }
@@ -45,7 +47,7 @@ std::string Arc::calculateThreadToFetch() {
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
 //    std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
-//    pimpl->setThread(threadToFetch);
+    pimpl->setThread(threadToFetch);
     return threadToFetch;
 }
 
@@ -55,6 +57,18 @@ AdaptionLogic Arc::getSelectedAdaptionLogic() {
 
 void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & interest) {
     sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
+
+    // TODO delete this (only used for experiments)
+    std::string name = interest->getName().getSubName(ndnrtc::prefix_filter::Stream, 1).toUri();
+    if (name == "/k") {
+        std::cout << "\t" << ndn_getNowMilliseconds() - counter
+                  << "\t" << counter2 + 1
+                  << "\t" << counter3 + 1
+                  << std::endl;
+        counter = ndn_getNowMilliseconds();
+        counter2++;
+    }
+    counter3++;
 }
 
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
@@ -72,13 +86,14 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             std::cout << "Interest not found in map." << std::endl;
         }
 
+        // TODO Find out why rtt keeps increasing over time
         double now = ndn_getNowMilliseconds();
-
-        double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s
+        double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
         long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
         long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
         dashJS_lastSegmentMeasuredThroughput = size / rtt; // bit/s
 
+        // TODO delete (only used for testing)
 //        std::cout << "pT = " << prodTime;
 //        std::cout << ", cT = " << now;
 //        std::cout << ", size = " << size << " bit";
@@ -86,6 +101,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 //        std::cout << ", rtt = " << rtt;
 //        std::cout << ", throughput = " << dashJS_lastSegmentMeasuredThroughput;
 //        std::cout << std::endl;
+
         calculateThreadToFetch();
     }
 }
