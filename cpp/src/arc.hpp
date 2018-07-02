@@ -54,10 +54,12 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         AdaptionLogic selectedAdaptionLogic = AdaptionLogic::NoAdaption;
         std::string threadToFetch;
         std::unordered_map<std::string, double> sentInterests;
-        boost::shared_ptr<RemoteStreamImpl> pimpl;
+        RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
 
-        int counter = 0; // TODO delete this after debugging
+        double counter = 0; // TODO delete this after debugging
+        double counter2 = 0; // TODO delete this after debugging
+        double counter3 = 0; // TODO delete this after debugging
         double dashJS_lastSegmentMeasuredThroughput = -1; // TODO move this into DASH-JS class
         double dashJS_lastSegmentCalculatedThroughput = 0; // TODO move this into DASH-JS class
 
