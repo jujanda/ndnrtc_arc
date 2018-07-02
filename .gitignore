@@ -65,3 +65,19 @@ tags
 *.sublime-workspace
 newwebrtc
 android
+
+# other (by Julian Janda)
+cpp/build/
+cpp/loopback/
+cpp/tests/policy_config/
+cpp/\.libs/libndnrtc\.so\.0
+cpp/\.libs/libndnrtc\.so\.0\.0\.0
+cpp/client/params\.cfg
+cpp/client/sample-consumer\.cfg
+cpp/client/sample-producer\.cfg
+cpp/client/test-freeculture\.cfg
+cpp/contrib
+cpp/ndnrtc-client
+.idea
+cmake-build-debug
+CMakeLists.txt

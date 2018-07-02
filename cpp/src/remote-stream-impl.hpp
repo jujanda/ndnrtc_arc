@@ -37,6 +37,7 @@ class IPlayout;
 class IPlayoutControl;
 class MediaStreamMeta;
 class RetransmissionController;
+class Arc;
 
 /**
  * RemoteStreamImpl is a base class for implementing remote stream functionality
@@ -97,6 +98,7 @@ class RemoteStreamImpl : public NdnRtcComponent
     boost::shared_ptr<IPlayout> playout_;
     boost::shared_ptr<IPlaybackQueue> playbackQueue_;
     boost::shared_ptr<RetransmissionController> rtxController_;
+    boost::shared_ptr<Arc> arc_;
 
     std::vector<ValidationErrorInfo> validationInfo_;
 

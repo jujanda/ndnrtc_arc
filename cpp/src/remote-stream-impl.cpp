@@ -27,6 +27,7 @@
 #include "playout.hpp"
 #include "sample-estimator.hpp"
 #include "rtx-controller.hpp"
+#include "arc.hpp"
 
 using namespace ndnrtc;
 using namespace ndnrtc::statistics;
@@ -66,17 +67,22 @@ RemoteStreamImpl::RemoteStreamImpl(asio::io_service &io,
     bufferControl_ = make_shared<BufferControl>(drdEstimator, buffer_, sstorage_);
     latencyControl_ = make_shared<LatencyControl>(1000, drdEstimator, sstorage_);
     interestControl_ = make_shared<InterestControl>(drdEstimator, sstorage_);
+    arc_ = make_shared<Arc>(AdaptionLogic::Dash_JS, this, sstorage_);
 
     // pipeliner and pipeline control created in subclasses
 
     segmentController_->attach(sampleEstimator_.get());
     segmentController_->attach(bufferControl_.get());
+    segmentController_->attach(arc_.get());
 
     drdEstimator->attach((InterestControl *)interestControl_.get());
     drdEstimator->attach((LatencyControl *)latencyControl_.get());
 
     bufferControl_->attach((InterestControl *)interestControl_.get());
     bufferControl_->attach((LatencyControl *)latencyControl_.get());
+
+    // interest queue
+    interestQueue_->registerObserver(arc_.get());
 }
 
 bool RemoteStreamImpl::isMetaFetched() const
