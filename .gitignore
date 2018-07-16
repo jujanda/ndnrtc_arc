@@ -80,3 +80,4 @@ cpp/contrib
 cpp/ndnrtc-client
 .idea
 cmake-build-debug
+*.raw
