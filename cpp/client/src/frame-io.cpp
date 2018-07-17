@@ -14,6 +14,8 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <iostream>
+
 
 #include "frame-io.hpp"
 
@@ -208,7 +210,12 @@ bool FileFrameSource::checkSourceForFrame(const std::string &path,
     int nFrames = lSize % frame.getFrameSizeInBytes();
     fclose(f);
 
+/*    std::cout   << "lSize = " << lSize 
+                << "\nframeSize = " << frame.getFrameSizeInBytes()
+                << "\nnFrames = " << nFrames
+                << std::endl;*/
     return (nFrames == 0);
+    // return true;
 }
 
 FILE *FileFrameSource::openFile_impl(string path)

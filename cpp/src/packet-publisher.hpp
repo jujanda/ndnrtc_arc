@@ -209,7 +209,7 @@ class PacketPublisher : public NdnRtcComponent
         {
             if (!forceFullPitClean)
                 fullPitClean_ = 0;
-            deepCleanPit(name);
+            // deepCleanPit(name);
         }
     }
 
