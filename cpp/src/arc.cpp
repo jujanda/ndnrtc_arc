@@ -24,11 +24,11 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     // TODO pass video thread data through config file params instead
     // TODO Check if info is delivered in meta data.
     videoThread rep1, rep2, rep3;
-    rep1.threadName = "representation01";
+    rep1.threadName = "low";
     rep1.max_bitrate = "1000";
-    rep2.threadName = "representation02";
+    rep2.threadName = "med";
     rep2.max_bitrate = "1500";
-    rep3.threadName = "representation03";
+    rep3.threadName = "high";
     rep3.max_bitrate = "2000";
     videoThreads.emplace_back(rep1);
     videoThreads.emplace_back(rep2);
@@ -46,7 +46,7 @@ std::string Arc::calculateThreadToFetch() {
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
-//    std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
+    std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
     pimpl->setThread(threadToFetch);
     return threadToFetch;
 }
@@ -59,7 +59,7 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
     sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
 
     // TODO delete this (only used for experiments)
-    std::string name = interest->getName().getSubName(ndnrtc::prefix_filter::Stream, 1).toUri();
+/*    std::string name = interest->getName().getSubName(ndnrtc::prefix_filter::Stream, 1).toUri();
     if (name == "/k") {
         std::cout << "\t" << ndn_getNowMilliseconds() - counter
                   << "\t" << counter2 + 1
@@ -68,7 +68,7 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
         counter = ndn_getNowMilliseconds();
         counter2++;
     }
-    counter3++;
+    counter3++;*/
 }
 
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
@@ -131,10 +131,11 @@ std::string Arc::dashJS() {
     double nextBn = std::floor((num1 + num2) / den); // nextSegmentCalculatedThroughput
     dashJS_lastSegmentCalculatedThroughput = nextBn;
 
-//    std::cout << "nextbn = " << nextBn; // TODO delete (only used for testing)
-//    std::cout << "   bn = " << bn; // TODO delete (only used for testing)
-//    std::cout << "   bm = " << bm; // TODO delete (only used for testing)
-//    std::cout << std::endl; // TODO delete (only used for testing)
+    // TODO delete (only used for testing)
+/*    std::cout << "nextbn = " << nextBn
+              << "\tbn = " << bn
+              << "\tbm = " << bm
+              << std::endl*/;
 
     // Rate selection
     for (auto selRep = videoThreads.rbegin(); selRep != videoThreads.rend(); ++selRep) {
