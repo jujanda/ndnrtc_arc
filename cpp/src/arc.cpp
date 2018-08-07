@@ -34,8 +34,11 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     videoThreads.emplace_back(rep2);
     videoThreads.emplace_back(rep3);
     this->pimpl = pimpl;
+    lastThreadtoFetchChangeTime = ndn_getNowMilliseconds();
 
-    threadToFetch = videoThreads.begin()->threadName; // TODO set initial threadToFetch dynamically
+    // TODO set initial threadToFetch dynamically
+    threadToFetch = videoThreads.begin()->threadName;
+
 }
 
 Arc::~Arc() = default;
@@ -46,8 +49,17 @@ std::string Arc::calculateThreadToFetch() {
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
-    std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
-    pimpl->setThread(threadToFetch);
+    // Force a minimum time between changes of representations
+    double now = ndn_getNowMilliseconds();
+    if (now - lastThreadtoFetchChangeTime >= 4000) {
+        std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
+        pimpl->setThread(threadToFetch);
+        lastThreadToFetch = threadToFetch;
+        lastThreadtoFetchChangeTime = now;
+    } else {
+//        std::cout << "Too early to change representation again." << std::endl;
+    }
+    // TODO change method output to void and delete this return statement
     return threadToFetch;
 }
 
@@ -107,11 +119,15 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 }
 
 std::string Arc::noAdaption() {
-    // TODO delete randomizer (only used for testing)
-/*    int min = 0;
+    // TODO extract code to its own "Random" adaption logic
+    int min = 0;
     int max = videoThreads.size() -1;
-    int randNum = min + (rand() % static_cast<int>(max - min + 1));
-    threadToFetch = videoThreads[randNum].threadName;*/
+    // Make sure the chosen representation differs from the last one
+    do {
+        int randNum = min + (rand() % static_cast<int>(max - min + 1));
+        threadToFetch = videoThreads[randNum].threadName;
+    } while (threadToFetch == lastThreadToFetch);
+
 
     // Do nothing
     return threadToFetch;

@@ -53,10 +53,12 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
     private:
         AdaptionLogic selectedAdaptionLogic = AdaptionLogic::NoAdaption;
         std::string threadToFetch;
+        std::string lastThreadToFetch = "";
         std::unordered_map<std::string, double> sentInterests;
         RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
 
+        double lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
         double counter3 = 0; // TODO delete this after debugging
