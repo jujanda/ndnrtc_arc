@@ -528,6 +528,13 @@ void PipelineControlStateMachine::detach(IPipelineControlStateMachineObserver *o
         observers_.erase(it);
 }
 
+void PipelineControlStateMachine::setThreadPrefix (std::string threadName){
+    ndn::Name newName = ppCtrl_->threadPrefix_.getPrefix(ppCtrl_->threadPrefix_.size() - 1);
+    newName.append(threadName);
+    ppCtrl_->threadPrefix_ = newName;
+    std::cout << "ppCtrl_->threadPrefix_ = " << ppCtrl_->threadPrefix_ << std::endl;
+}
+
 #pragma mark - private
 bool PipelineControlStateMachine::transition(const boost::shared_ptr<const PipelineControlEvent> &ev)
 {

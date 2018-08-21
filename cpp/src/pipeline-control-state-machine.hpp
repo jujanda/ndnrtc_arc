@@ -158,7 +158,7 @@ class PipelineControlStateMachine : public NdnRtcComponent
     {
         _Struct(const ndn::Name threadPrefix) : threadPrefix_(threadPrefix) {}
 
-        const ndn::Name threadPrefix_;
+        /*const */ndn::Name threadPrefix_;
         boost::shared_ptr<IBuffer> buffer_;
         boost::shared_ptr<IPipeliner> pipeliner_;
         boost::shared_ptr<IInterestControl> interestControl_;
@@ -178,6 +178,8 @@ class PipelineControlStateMachine : public NdnRtcComponent
     void attach(IPipelineControlStateMachineObserver *);
     // not thread-safe! should be called on the same thread as dispatch(...)
     void detach(IPipelineControlStateMachineObserver *);
+    // //TODO description
+    void setThreadPrefix (std::string threadName);
 
     static PipelineControlStateMachine defaultStateMachine(Struct ctrl);
     static PipelineControlStateMachine videoStateMachine(Struct ctrl);

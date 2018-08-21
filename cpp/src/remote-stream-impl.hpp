@@ -70,6 +70,7 @@ class RemoteStreamImpl : public NdnRtcComponent
 
     void setNeedsMeta(bool needMeta) { needMeta_ = needMeta; }
     statistics::StatisticsStorage getStatistics() const;
+    boost::shared_ptr<PipelineControl> getPipelineControl () {return pipelineControl_;}; // TODO implement this in .cpp file
 
   protected:
     MediaStreamParams::MediaStreamType type_;

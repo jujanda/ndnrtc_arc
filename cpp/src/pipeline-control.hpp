@@ -59,6 +59,7 @@ class PipelineControl : public NdnRtcComponent,
 
     bool needPipelineAdjustment(const PipelineAdjust &);
     void setLogger(boost::shared_ptr<ndnlog::new_api::Logger> logger);
+    PipelineControlStateMachine getMachine() {return machine_;}; // TODO make method in .cpp file
 
     static PipelineControl defaultPipelineControl(const ndn::Name &threadPrefix,
                                                   const boost::shared_ptr<IBuffer> buffer,

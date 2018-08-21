@@ -53,7 +53,8 @@ std::string Arc::calculateThreadToFetch() {
     double now = ndn_getNowMilliseconds();
     if (now - lastThreadtoFetchChangeTime >= 4000) {
         std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
-        pimpl->setThread(threadToFetch);
+        // pimpl->setThread(threadToFetch);
+        pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
         lastThreadToFetch = threadToFetch;
         lastThreadtoFetchChangeTime = now;
     } else {

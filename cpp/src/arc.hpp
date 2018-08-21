@@ -12,6 +12,8 @@
 #include <boost/thread.hpp>
 #include "segment-controller.hpp"
 #include "remote-stream-impl.hpp"
+#include "pipeline-control-state-machine.hpp"
+#include "pipeline-control.hpp"
 #include "interest-queue.hpp"
 
 namespace ndnrtc{
