@@ -43,25 +43,21 @@ Arc::Arc(AdaptionLogic adaptionLogic,
 
 Arc::~Arc() = default;
 
-std::string Arc::calculateThreadToFetch() {
+void Arc::calculateThreadToFetch() {
     switch (getSelectedAdaptionLogic()) {
         case AdaptionLogic::NoAdaption: threadToFetch = noAdaption(); break;
+        case AdaptionLogic::Random: threadToFetch = randomAdaption(); break;
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
     // Force a minimum time between changes of representations
     double now = ndn_getNowMilliseconds();
-    if (now - lastThreadtoFetchChangeTime >= 4000) {
+    if (now - lastThreadtoFetchChangeTime >= MINIMUM_THREAD_TIME && threadToFetch != lastThreadToFetch) {
         std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
-        // pimpl->setThread(threadToFetch);
         pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
         lastThreadToFetch = threadToFetch;
         lastThreadtoFetchChangeTime = now;
-    } else {
-//        std::cout << "Too early to change representation again." << std::endl;
     }
-    // TODO change method output to void and delete this return statement
-    return threadToFetch;
 }
 
 AdaptionLogic Arc::getSelectedAdaptionLogic() {
@@ -87,7 +83,7 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
     if(wireSeg->isPacketHeaderSegment() && wireSeg->getSampleClass() == SampleClass::Key) {
-        // TODO only use info from video segments
+        // TODO only use info from video segments (?)
 //        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
 
         double prodTime;
@@ -120,7 +116,11 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 }
 
 std::string Arc::noAdaption() {
-    // TODO extract code to its own "Random" adaption logic
+    // Do nothing
+    return threadToFetch;
+}
+
+std::string Arc::randomAdaption() {
     int min = 0;
     int max = videoThreads.size() -1;
     // Make sure the chosen representation differs from the last one
@@ -129,8 +129,6 @@ std::string Arc::noAdaption() {
         threadToFetch = videoThreads[randNum].threadName;
     } while (threadToFetch == lastThreadToFetch);
 
-
-    // Do nothing
     return threadToFetch;
 }
 

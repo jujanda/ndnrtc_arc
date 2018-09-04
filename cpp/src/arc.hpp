@@ -20,6 +20,7 @@ namespace ndnrtc{
 
     enum class AdaptionLogic {
         NoAdaption,
+        Random,
         Dash_JS,
         Thang
     };
@@ -36,7 +37,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
             boost::shared_ptr<statistics::StatisticsStorage> &storage);
         ~Arc();
 
-        std::string calculateThreadToFetch();
+        void calculateThreadToFetch();
         AdaptionLogic getSelectedAdaptionLogic();
 
         // TODO Should videoThread vector & structs be private?
@@ -60,6 +61,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
 
+        int MINIMUM_THREAD_TIME = 4000;
         double lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
@@ -80,6 +82,11 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
          * This logic doesn't change the current representation at all. Used when ARC is disabled.
          */
         std::string noAdaption();
+
+        /**
+         * This logic changes to a random representation out of all available ones
+         */
+        std::string randomAdaption();
 
         /**
          * This adaption logic calculates a suggested bitrate for the next segment,
