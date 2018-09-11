@@ -29,6 +29,7 @@ namespace ndnrtc{
      * TODO: Write description
      * ARC assumes that representations are given in an ordered list, sorted by quality in ascending order
      */
+     // TODO Inherit from ndnrtccomponent?
 class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQueueObserver
     {
     public:
@@ -38,7 +39,8 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         ~Arc();
 
         void calculateThreadToFetch();
-        AdaptionLogic getSelectedAdaptionLogic();
+        void setThreadsMeta (std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta);
+        AdaptionLogic getSelectedAdaptionLogic(); // TODO delete this?
 
         // TODO Should videoThread vector & structs be private?
         struct videoThread {
@@ -60,8 +62,10 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         std::unordered_map<std::string, double> sentInterests;
         RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
+        std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta_;
 
-        int MINIMUM_THREAD_TIME = 4000;
+        bool metaFetched = false;
+        int minimumThreadTime = 4000;
         double lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
@@ -77,6 +81,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         void segmentRequestTimeout(const NamespaceInfo&) override { /*ignored*/ }
         void segmentNack(const NamespaceInfo&, int) override { /*ignored*/ }
         void segmentStarvation() override { /*ignored*/ }
+
 
         /**
          * This logic doesn't change the current representation at all. Used when ARC is disabled.

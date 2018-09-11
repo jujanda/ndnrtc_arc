@@ -110,8 +110,12 @@ Pipeliner::onIncomingData(const ndn::Name& threadPrefix)
             << (nextSamplePriority_ == SampleClass::Delta ? seqCounter_.delta_ : seqCounter_.key_)
             << " " << SAMPLE_SUFFIX(n) << " x" << batch.size() << std::endl;
         
-        if (nextSamplePriority_ == SampleClass::Delta) seqCounter_.delta_++;
-        else seqCounter_.key_++;
+        if (nextSamplePriority_ == SampleClass::Delta) {
+            seqCounter_.delta_++;
+        } else {
+            seqCounter_.key_++;
+            std::cout << "Next frame is key." << std::endl;
+        }
 
         lastRequestedSample_ = nextSamplePriority_;
         nextSamplePriority_ = SampleClass::Delta;

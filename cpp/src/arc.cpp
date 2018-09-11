@@ -21,8 +21,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
 {
     // TODO write about observing in description
     // TODO Check out 'rate-adaption-module.hpp' for hints
-    // TODO pass video thread data through config file params instead
-    // TODO Check if info is delivered in meta data.
+    // TODO Threadinfo not delivered in meta data (only names) --> Find solution for that
     videoThread rep1, rep2, rep3;
     rep1.threadName = "low";
     rep1.max_bitrate = "1000";
@@ -36,14 +35,31 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     this->pimpl = pimpl;
     lastThreadtoFetchChangeTime = ndn_getNowMilliseconds();
 
-    // TODO set initial threadToFetch dynamically
+    // TODO set initial threadToFetch dynamically from config file | look how remote-stream-impl.cpp handles that
     threadToFetch = videoThreads.begin()->threadName;
 
 }
 
 Arc::~Arc() = default;
 
+void Arc::setThreadsMeta(std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta) {
+    threadsMeta_ = threadsMeta;
+    metaFetched = true;
+/*    std::cout << "Meta fetched for arc" << std::endl;
+    for (auto &x : threadsMeta_)
+    {
+        std::cout << x.first
+                  << ':'
+                  << x.second->getLength()
+                  << std::endl ;
+    }*/
+}
+
 void Arc::calculateThreadToFetch() {
+    if (!metaFetched) {
+        return;
+    }
+
     switch (getSelectedAdaptionLogic()) {
         case AdaptionLogic::NoAdaption: threadToFetch = noAdaption(); break;
         case AdaptionLogic::Random: threadToFetch = randomAdaption(); break;
@@ -52,8 +68,9 @@ void Arc::calculateThreadToFetch() {
     }
     // Force a minimum time between changes of representations
     double now = ndn_getNowMilliseconds();
-    if (now - lastThreadtoFetchChangeTime >= MINIMUM_THREAD_TIME && threadToFetch != lastThreadToFetch) {
+    if (now - lastThreadtoFetchChangeTime >= minimumThreadTime && threadToFetch != lastThreadToFetch) {
         std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
+        pimpl->setThread(threadToFetch);
         pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
         lastThreadToFetch = threadToFetch;
         lastThreadtoFetchChangeTime = now;
@@ -83,7 +100,7 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
     if(wireSeg->isPacketHeaderSegment() && wireSeg->getSampleClass() == SampleClass::Key) {
-        // TODO only use info from video segments (?)
+        // TODO only use info from video segments (is this necessary?)
 //        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
 
         double prodTime;
