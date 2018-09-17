@@ -10,10 +10,9 @@
     <list default="true" id="ce15d5a8-c4af-4fbb-b0d5-c0d2796471d5" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/.libs/libndnrtc.so.0.0.0" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/.libs/libndnrtc.so.0.0.0" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/arc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/arc.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/arc.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/arc.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/src/pipeliner.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/pipeliner.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/tests/loopback-consumer.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/tests/loopback-consumer.cfg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/tests/loopback-producer.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/tests/loopback-producer.cfg" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -31,17 +30,35 @@
           <file leaf-file-name="pipeline-control-state-machine.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cpp/src/pipeline-control-state-machine.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-4">
+                <state relative-caret-position="1680">
                   <caret line="124" column="7" selection-start-line="124" selection-start-column="7" selection-end-line="124" selection-end-column="7" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="pipeliner.cpp" pinned="false" current-in-tab="false">
+          <file leaf-file-name="pipeliner.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="706">
-                  <caret line="116" column="35" selection-start-line="116" selection-end-line="117" />
+                <state relative-caret-position="382">
+                  <caret line="88" column="25" selection-start-line="88" selection-end-line="88" selection-end-column="25" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="packet-publisher.hpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/cpp/src/packet-publisher.hpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="954">
+                  <caret line="53" column="4" selection-start-line="53" selection-start-column="3" selection-end-line="53" selection-end-column="4" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="video-stream-impl.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/cpp/src/video-stream-impl.cpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="281">
+                  <caret line="179" column="40" selection-start-line="179" selection-start-column="40" selection-end-line="179" selection-end-column="40" />
                 </state>
               </provider>
             </entry>
@@ -55,11 +72,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="remote-stream-impl.cpp" pinned="false" current-in-tab="true">
+          <file leaf-file-name="remote-stream-impl.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="828">
-                  <caret line="73" column="38" lean-forward="true" selection-start-line="73" selection-start-column="38" selection-end-line="73" selection-end-column="38" />
+                <state relative-caret-position="1242">
+                  <caret line="69" column="10" selection-start-line="69" selection-start-column="6" selection-end-line="69" selection-end-column="10" />
                 </state>
               </provider>
             </entry>
@@ -89,8 +106,8 @@
           <file leaf-file-name="arc.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2044">
-                  <caret line="136" column="24" selection-start-line="136" selection-start-column="11" selection-end-line="136" selection-end-column="24" />
+                <state relative-caret-position="1248">
+                  <caret line="119" column="44" selection-start-line="119" selection-start-column="8" selection-end-line="119" selection-end-column="44" />
                 </state>
               </provider>
             </entry>
@@ -117,8 +134,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find />
-      <find>dropped</find>
       <find>setThread</find>
       <find>reset</find>
       <find>feedFrame</find>
@@ -146,6 +161,9 @@
       <find>set</find>
       <find>threadPrefix</find>
       <find>onIncomingData</find>
+      <find>arc_</find>
+      <find>networkdata</find>
+      <find>px</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -168,8 +186,8 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2626" />
-    <option name="y" value="-11" />
+    <option name="x" value="66" />
+    <option name="y" value="1429" />
     <option name="width" value="2495" />
     <option name="height" value="1452" />
   </component>
@@ -289,15 +307,17 @@
       <workItem from="1536040507991" duration="8660000" />
       <workItem from="1536127596975" duration="2224000" />
       <workItem from="1536570102106" duration="5448000" />
-      <workItem from="1536645709641" duration="393000" />
+      <workItem from="1536645709641" duration="1490000" />
+      <workItem from="1536648492522" duration="1597000" />
+      <workItem from="1536732357930" duration="3049000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61760000" />
+    <option name="totallyTimeSpent" value="67503000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="66" y="-11" width="2495" height="1452" extended-state="6" />
+    <frame x="66" y="1429" width="2495" height="1452" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14681107" />
@@ -392,13 +412,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/packet-publisher.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3726">
-          <caret line="207" column="20" selection-start-line="207" selection-start-column="20" selection-end-line="207" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cpp/client/src/stat-collector.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="634">
@@ -417,13 +430,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="779">
           <caret line="53" column="23" selection-start-line="53" selection-start-column="18" selection-end-line="53" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/video-stream-impl.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3222">
-          <caret line="179" column="40" selection-start-line="179" selection-start-column="40" selection-end-line="179" selection-end-column="40" />
         </state>
       </provider>
     </entry>
@@ -582,13 +588,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/arc.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="738">
-          <caret line="41" column="23" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/frame-data.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1008">
@@ -610,31 +609,52 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
+    <entry file="file://$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2044">
-          <caret line="136" column="24" selection-start-line="136" selection-start-column="11" selection-end-line="136" selection-end-column="24" />
+        <state relative-caret-position="1242">
+          <caret line="69" column="10" selection-start-line="69" selection-start-column="6" selection-end-line="69" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/packet-publisher.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="954">
+          <caret line="53" column="4" selection-start-line="53" selection-start-column="3" selection-end-line="53" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/video-stream-impl.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="281">
+          <caret line="179" column="40" selection-start-line="179" selection-start-column="40" selection-end-line="179" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/arc.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="738">
+          <caret line="41" column="23" selection-start-line="41" selection-start-column="23" selection-end-line="41" selection-end-column="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/pipeline-control-state-machine.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4">
+        <state relative-caret-position="1680">
           <caret line="124" column="7" selection-start-line="124" selection-start-column="7" selection-end-line="124" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1248">
+          <caret line="119" column="44" selection-start-line="119" selection-start-column="8" selection-end-line="119" selection-end-column="44" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="706">
-          <caret line="116" column="35" selection-start-line="116" selection-end-line="117" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="828">
-          <caret line="73" column="38" lean-forward="true" selection-start-line="73" selection-start-column="38" selection-end-line="73" selection-end-column="38" />
+        <state relative-caret-position="382">
+          <caret line="88" column="25" selection-start-line="88" selection-end-line="88" selection-end-column="25" />
         </state>
       </provider>
     </entry>
