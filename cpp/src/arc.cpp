@@ -20,7 +20,6 @@ Arc::Arc(AdaptionLogic adaptionLogic,
           sstorage_(storage)
 {
     // TODO write about observing in description
-    // TODO Check out 'rate-adaption-module.hpp' for hints
     // TODO Threadinfo not delivered in meta data (only names) --> Find solution for that
     videoThread rep1, rep2, rep3;
     rep1.threadName = "low";
@@ -66,16 +65,26 @@ void Arc::calculateThreadToFetch() {
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
+}
+
+void Arc::switchThread() {
     // Force a minimum time between changes of representations
     double now = ndn_getNowMilliseconds();
     if (now - lastThreadtoFetchChangeTime >= minimumThreadTime && threadToFetch != lastThreadToFetch) {
+
+        // TODO Find desc for this part or delete it
         std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
         pimpl->setThread(threadToFetch);
+
+        // Actually change threadPrefix in PipelineControlstateMachine
         pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
+
+        // Tidy up and prepare for next round
         lastThreadToFetch = threadToFetch;
         lastThreadtoFetchChangeTime = now;
     }
 }
+
 
 AdaptionLogic Arc::getSelectedAdaptionLogic() {
     return selectedAdaptionLogic;
@@ -99,27 +108,42 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
-    if(wireSeg->isPacketHeaderSegment() && wireSeg->getSampleClass() == SampleClass::Key) {
-        // TODO only use info from video segments (is this necessary?)
-//        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
+    // Only do once per frame
+    if(wireSeg->isPacketHeaderSegment()){
 
-        double prodTime;
-        std::string name = wireSeg->getData()->getName().toUri();
-        auto search = sentInterests.find(name);
-        if(search != sentInterests.end()) {
-            prodTime = search->second;
-        } else {
-            std::cout << "Interest not found in map." << std::endl;
+        // New frame started
+        gopCounter++;
+        std::cout << "gopCounter: " << gopCounter << std::endl;
+
+        // Switch before the next iFrame
+        // TODO find out why 20 leads to no new keyframes send
+        if(gopCounter == 25) { // TODO use GopSize-1
+        switchThread();
         }
 
-        // TODO Find out why rtt keeps increasing over time
-        double now = ndn_getNowMilliseconds();
-        double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
-        long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
-        long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
-        dashJS_lastSegmentMeasuredThroughput = size / rtt; // bit/s
+        // Only do for key frames
+        if(wireSeg->getSampleClass() == SampleClass::Key) {
+            // TODO only use info from video segments (is this necessary?)
+//        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
+            std::cout << "Keyframe Received" << std::endl;
 
-        // TODO delete (only used for testing)
+            double prodTime;
+            std::string name = wireSeg->getData()->getName().toUri();
+            auto searchResult = sentInterests.find(name);
+            if(searchResult != sentInterests.end()) {
+                prodTime = searchResult->second;
+            } else {
+                std::cout << "Interest not found in map." << std::endl;
+            }
+
+            // TODO Find out why rtt keeps increasing over time
+            double now = ndn_getNowMilliseconds();
+            double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
+            long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
+            long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
+            dashJS_lastSegmentMeasuredThroughput = size / rtt; // bit/s
+
+            // TODO delete (only used for testing)
 //        std::cout << "pT = " << prodTime;
 //        std::cout << ", cT = " << now;
 //        std::cout << ", size = " << size << " bit";
@@ -128,8 +152,11 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 //        std::cout << ", throughput = " << dashJS_lastSegmentMeasuredThroughput;
 //        std::cout << std::endl;
 
-        calculateThreadToFetch();
+            calculateThreadToFetch();
+            gopCounter = 1;
+        }
     }
+
 }
 
 std::string Arc::noAdaption() {

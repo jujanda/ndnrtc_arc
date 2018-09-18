@@ -114,7 +114,7 @@ Pipeliner::onIncomingData(const ndn::Name& threadPrefix)
             seqCounter_.delta_++;
         } else {
             seqCounter_.key_++;
-            std::cout << "Next frame is key." << std::endl;
+//            std::cout << "Next frame is key." << std::endl;
         }
 
         lastRequestedSample_ = nextSamplePriority_;

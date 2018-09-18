@@ -39,6 +39,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         ~Arc();
 
         void calculateThreadToFetch();
+        void switchThread();
         void setThreadsMeta (std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta);
         AdaptionLogic getSelectedAdaptionLogic(); // TODO delete this?
 
@@ -66,6 +67,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
 
         bool metaFetched = false;
         int minimumThreadTime = 4000;
+        int gopCounter = 0;
         double lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
