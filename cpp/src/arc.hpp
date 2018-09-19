@@ -68,6 +68,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         bool metaFetched = false;
         int minimumThreadTime = 4000;
         int gopCounter = 0;
+        double arcStartTime = 0;
         double lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging

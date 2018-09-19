@@ -32,6 +32,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     videoThreads.emplace_back(rep2);
     videoThreads.emplace_back(rep3);
     this->pimpl = pimpl;
+    arcStartTime = ndn_getNowMilliseconds();
     lastThreadtoFetchChangeTime = ndn_getNowMilliseconds();
 
     // TODO set initial threadToFetch dynamically from config file | look how remote-stream-impl.cpp handles that
@@ -55,6 +56,7 @@ void Arc::setThreadsMeta(std::map<std::string, boost::shared_ptr<NetworkData>> t
 }
 
 void Arc::calculateThreadToFetch() {
+    // TODO Evaluate if thi is still needed
     if (!metaFetched) {
         return;
     }
@@ -73,8 +75,9 @@ void Arc::switchThread() {
     if (now - lastThreadtoFetchChangeTime >= minimumThreadTime && threadToFetch != lastThreadToFetch) {
 
         // TODO Find desc for this part or delete it
-        std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
-        pimpl->setThread(threadToFetch);
+        std::cout << "Setting threadToFetch = " << threadToFetch
+                  << " (@ " << now - arcStartTime << "ms)" << std::endl;
+//        pimpl->setThread(threadToFetch);
 
         // Actually change threadPrefix in PipelineControlstateMachine
         pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
@@ -113,11 +116,11 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
         // New frame started
         gopCounter++;
-        std::cout << "gopCounter: " << gopCounter << std::endl;
+//        std::cout << "gopCounter: " << gopCounter << std::endl;
 
         // Switch before the next iFrame
         // TODO find out why 20 leads to no new keyframes send
-        if(gopCounter == 25) { // TODO use GopSize-1
+        if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption && gopCounter == 25) { // TODO use GopSize-1
         switchThread();
         }
 
@@ -125,7 +128,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         if(wireSeg->getSampleClass() == SampleClass::Key) {
             // TODO only use info from video segments (is this necessary?)
 //        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
-            std::cout << "Keyframe Received" << std::endl;
+            std::cout << "Keyframe Received (GOP = " << gopCounter-1 << ")" << std::endl;
 
             double prodTime;
             std::string name = wireSeg->getData()->getName().toUri();
