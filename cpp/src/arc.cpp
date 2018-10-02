@@ -37,7 +37,6 @@ Arc::Arc(AdaptionLogic adaptionLogic,
 
     // TODO set initial threadToFetch dynamically from config file | look how remote-stream-impl.cpp handles that
     threadToFetch = videoThreads.begin()->threadName;
-
 }
 
 Arc::~Arc() = default;
@@ -56,7 +55,7 @@ void Arc::setThreadsMeta(std::map<std::string, boost::shared_ptr<NetworkData>> t
 }
 
 void Arc::calculateThreadToFetch() {
-    // TODO Evaluate if thi is still needed
+    // TODO Evaluate if this is still needed
     if (!metaFetched) {
         return;
     }
@@ -70,22 +69,7 @@ void Arc::calculateThreadToFetch() {
 }
 
 void Arc::switchThread() {
-    // Force a minimum time between changes of representations
-    double now = ndn_getNowMilliseconds();
-    if (now - lastThreadtoFetchChangeTime >= minimumThreadTime && threadToFetch != lastThreadToFetch) {
-
-        // TODO Find desc for this part or delete it
-        std::cout << "Setting threadToFetch = " << threadToFetch
-                  << " (@ " << now - arcStartTime << "ms)" << std::endl;
-//        pimpl->setThread(threadToFetch);
-
-        // Actually change threadPrefix in PipelineControlstateMachine
-        pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
-
-        // Tidy up and prepare for next round
-        lastThreadToFetch = threadToFetch;
-        lastThreadtoFetchChangeTime = now;
-    }
+    //TODO Delete this method if no longer needed
 }
 
 
@@ -111,36 +95,73 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
+    if(wireSeg->getSegmentClass() == SegmentClass::Parity){
+//        std::cout << "Parity packet received" << std::endl;
+    }
+
+    if(wireSeg->getSampleClass() == SampleClass::Delta){
+//        std::cout << "Delta packet received" << std::endl;
+    }
+
     // Only do once per frame
     if(wireSeg->isPacketHeaderSegment()){
 
+        // Save time of arrival
+        double now = ndn_getNowMilliseconds();
+
         // New frame started
         gopCounter++;
-//        std::cout << "gopCounter: " << gopCounter << std::endl;
 
-        // Switch before the next iFrame
         // TODO find out why 20 leads to no new keyframes send
-        if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption && gopCounter == 25) { // TODO use GopSize-1
-        switchThread();
+        // TODO use GopSize-1
+        /*
+         * Switch if the following criteria are met:
+         *  - Adaption logic that switches is selected
+         *  - We are close to the next key frame
+         *  - We would actually switch to a new thread
+         *  - A minimum of time has passed since last switch
+         */
+        if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption &&
+//           gopCounter == 25 &&
+           wireSeg->getSampleClass() == SampleClass::Key &&
+           threadToFetch != lastThreadToFetch &&
+           now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
+
+            // TODO Delete this after Debugging
+            std::cout << "Setting threadToFetch = " << threadToFetch
+                      << " (@ " << now - arcStartTime << "ms)" << std::endl;
+
+            // TODO find out if this can be omitted
+            pimpl->setThread(threadToFetch);
+
+            // Actually change threadPrefix in PipelineControlStateMachine
+            pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
+
+            // Tidy up and prepare for next round
+            lastThreadToFetch = threadToFetch;
+            lastThreadtoFetchChangeTime = now;
         }
 
         // Only do for key frames
         if(wireSeg->getSampleClass() == SampleClass::Key) {
-            // TODO only use info from video segments (is this necessary?)
-//        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
+
+            // TODO only use info from video segments (is this still necessary?)
+//            std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
             std::cout << "Keyframe Received (GOP = " << gopCounter-1 << ")" << std::endl;
 
+            // Get the timestamp for when the corresponding Interest was sent
             double prodTime;
             std::string name = wireSeg->getData()->getName().toUri();
             auto searchResult = sentInterests.find(name);
             if(searchResult != sentInterests.end()) {
                 prodTime = searchResult->second;
             } else {
+                // TODO Change to real Error log message
                 std::cout << "Interest not found in map." << std::endl;
             }
 
-            // TODO Find out why rtt keeps increasing over time
-            double now = ndn_getNowMilliseconds();
+            // TODO Find out why rtt keeps increasing over time (is it still?)
+//            double now = ndn_getNowMilliseconds();
             double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
             long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
             long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
