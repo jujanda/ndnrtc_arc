@@ -112,6 +112,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
         // New frame started
         gopCounter++;
+//        std::cout << "Current arc-GOP = " << gopCounter << std::endl;
 
         // TODO find out why 20 leads to no new keyframes send
         // TODO use GopSize-1
@@ -123,8 +124,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
          *  - A minimum of time has passed since last switch
          */
         if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption &&
-//           gopCounter == 25 &&
-           wireSeg->getSampleClass() == SampleClass::Key &&
+           gopCounter == 25 &&
+//           wireSeg->getSampleClass() == SampleClass::Key &&
            threadToFetch != lastThreadToFetch &&
            now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
 
@@ -148,7 +149,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
             // TODO only use info from video segments (is this still necessary?)
 //            std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
-            std::cout << "Keyframe Received (GOP = " << gopCounter-1 << ")" << std::endl;
+            std::cout << "Keyframe Received (GOP = " << gopCounter << ")" << std::endl;
 
             // Get the timestamp for when the corresponding Interest was sent
             double prodTime;
@@ -178,7 +179,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 //        std::cout << std::endl;
 
             calculateThreadToFetch();
-            gopCounter = 1;
+            gopCounter = 0;
         }
     }
 
