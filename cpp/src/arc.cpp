@@ -63,6 +63,7 @@ void Arc::calculateThreadToFetch() {
     switch (getSelectedAdaptionLogic()) {
         case AdaptionLogic::NoAdaption: threadToFetch = noAdaption(); break;
         case AdaptionLogic::Random: threadToFetch = randomAdaption(); break;
+        case AdaptionLogic::Sequential: threadToFetch = sequentialAdaption(); break;
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
@@ -132,7 +133,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
                       << " (@ " << now - arcStartTime << "ms)" << std::endl;
 
             // TODO find out if this can be omitted
-            pimpl->setThread(threadToFetch);
+//            pimpl->setThread(threadToFetch);
 
             // Actually change threadPrefix in PipelineControlStateMachine
             pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
@@ -197,6 +198,17 @@ std::string Arc::randomAdaption() {
         threadToFetch = videoThreads[randNum].threadName;
     } while (threadToFetch == lastThreadToFetch);
 
+    return threadToFetch;
+}
+
+std::string Arc::sequentialAdaption() {
+    // Reset counter to avoid overflow
+    if(sequentialadaptionThreadCounter >= videoThreads.size()) {
+        sequentialadaptionThreadCounter = 0;
+    }
+    // Set next thread to be the next one in the list of representations
+    threadToFetch = videoThreads[sequentialadaptionThreadCounter].threadName;
+    sequentialadaptionThreadCounter++;
     return threadToFetch;
 }
 

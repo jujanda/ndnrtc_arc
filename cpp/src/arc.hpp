@@ -21,6 +21,7 @@ namespace ndnrtc{
     enum class AdaptionLogic {
         NoAdaption,
         Random,
+        Sequential,
         Dash_JS,
         Thang
     };
@@ -60,6 +61,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         AdaptionLogic selectedAdaptionLogic = AdaptionLogic::NoAdaption;
         std::string threadToFetch;
         std::string lastThreadToFetch = "";
+        int sequentialadaptionThreadCounter = 0;
         std::unordered_map<std::string, double> sentInterests;
         RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
@@ -97,6 +99,13 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         std::string randomAdaption();
 
         /**
+         * This logic changes to the next highest representation available until it reaches
+         * the highest, after which ist loops back to the lowest and starts from anew.
+         */
+        std::string sequentialAdaption();
+
+
+    /**
          * This adaption logic calculates a suggested bitrate for the next segment,
          * by using the calculation result from the last segment (low weight) and the
          * measured actual throughput of the last segment (high weight).
