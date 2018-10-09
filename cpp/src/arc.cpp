@@ -37,6 +37,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
 
     // TODO set initial threadToFetch dynamically from config file | look how remote-stream-impl.cpp handles that
     threadToFetch = videoThreads.begin()->threadName;
+    lastThreadToFetch = threadToFetch;
 }
 
 Arc::~Arc() = default;
@@ -112,19 +113,18 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
         // New frame started
         gopCounter++;
-//        std::cout << "Current arc-GOP = " << gopCounter << std::endl;
 
         // TODO find out why 20 leads to no new keyframes send
         // TODO use GopSize-1
         /*
          * Switch if the following criteria are met:
          *  - Adaption logic that switches is selected
-         *  - We are close to the next key frame
+         *  - We are close to the next key frame (gopCounter)
          *  - We would actually switch to a new thread
          *  - A minimum of time has passed since last switch
          */
         if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption &&
-           gopCounter == 25 &&
+           gopCounter == 29 &&
 //           wireSeg->getSampleClass() == SampleClass::Key &&
            threadToFetch != lastThreadToFetch &&
            now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
@@ -133,8 +133,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             std::cout << "Setting threadToFetch = " << threadToFetch
                       << " (@ " << now - arcStartTime << "ms)" << std::endl;
 
-            // TODO find out if this can be omitted
-//            pimpl->setThread(threadToFetch);
+            // TODO find out if this can be omitted (seems beneficial)
+            pimpl->setThread(threadToFetch);
 
             // Actually change threadPrefix in PipelineControlStateMachine
             pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
@@ -203,13 +203,18 @@ std::string Arc::randomAdaption() {
 }
 
 std::string Arc::sequentialAdaption() {
+    // Skip adaption if there already is a new threadToFetch determined
+    if(lastThreadToFetch != threadToFetch) {
+        return threadToFetch;
+    }
+
     // Reset counter to avoid overflow
-    if(sequentialadaptionThreadCounter >= videoThreads.size()) {
-        sequentialadaptionThreadCounter = 0;
+    if(sequentialAdaptionThreadCounter >= videoThreads.size()) {
+        sequentialAdaptionThreadCounter = 0;
     }
     // Set next thread to be the next one in the list of representations
-    threadToFetch = videoThreads[sequentialadaptionThreadCounter].threadName;
-    sequentialadaptionThreadCounter++;
+    threadToFetch = videoThreads[sequentialAdaptionThreadCounter].threadName;
+    sequentialAdaptionThreadCounter++;
     return threadToFetch;
 }
 

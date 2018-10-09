@@ -61,7 +61,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         AdaptionLogic selectedAdaptionLogic = AdaptionLogic::NoAdaption;
         std::string threadToFetch;
         std::string lastThreadToFetch = "";
-        int sequentialadaptionThreadCounter = 0;
+        int sequentialAdaptionThreadCounter = 0;
         std::unordered_map<std::string, double> sentInterests;
         RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
