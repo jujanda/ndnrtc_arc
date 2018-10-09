@@ -15,6 +15,7 @@
 #include "pipeline-control-state-machine.hpp"
 #include "pipeline-control.hpp"
 #include "interest-queue.hpp"
+#include "simple-log.hpp"
 
 namespace ndnrtc{
 

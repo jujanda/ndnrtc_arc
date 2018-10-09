@@ -38,6 +38,9 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     // TODO set initial threadToFetch dynamically from config file | look how remote-stream-impl.cpp handles that
     threadToFetch = videoThreads.begin()->threadName;
     lastThreadToFetch = threadToFetch;
+
+    // Prepare simple-logger
+    LogWarn("/tmp/arcLog.csv") << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -108,6 +111,9 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     // Only do once per frame
     if(wireSeg->isPacketHeaderSegment()){
 
+        // Log arrival
+        LogWarn("/tmp/arcLog.csv") << "[incomingFrame]" << wireSeg->getData()->getName().toUri() << std::endl;
+
         // Save time of arrival
         double now = ndn_getNowMilliseconds();
 
@@ -132,6 +138,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // TODO Delete this after Debugging
             std::cout << "Setting threadToFetch = " << threadToFetch
                       << " (@ " << now - arcStartTime << "ms)" << std::endl;
+            LogWarn("/tmp/arcLog.csv") << "[switchingThread]" << threadToFetch << std::endl;
+
 
             // TODO find out if this can be omitted (seems beneficial)
             pimpl->setThread(threadToFetch);
@@ -149,7 +157,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
             // TODO only use info from video segments (is this still necessary?)
 //            std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
-            std::cout << "Keyframe Received (GOP = " << gopCounter << ")" << std::endl;
+//            std::cout << "Keyframe Received (GOP = " << gopCounter << ")" << std::endl;
+            LogWarn("/tmp/arcLog.csv") << "[incomingKeyFrame]" << gopCounter << std::endl;
 
             // Get the timestamp for when the corresponding Interest was sent
             double prodTime;

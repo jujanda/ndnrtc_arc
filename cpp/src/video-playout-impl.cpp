@@ -88,12 +88,14 @@ bool VideoPlayoutImpl::processSample(const boost::shared_ptr<const BufferSlot>& 
         if (!slot->getNameInfo().isDelta_)
         {
             gopIsValid_ = true;
-            std::cout << "gopIsValid_ = " << gopIsValid_<< "(true)" << std::endl;
+//            std::cout << "gopIsValid_ = " << gopIsValid_<< "(true)" << std::endl;
 
             ++gopCount_;
 
             LogTraceC << "gop " << gopCount_ << std::endl;
-            std::cout << "gop " << gopCount_ << std::endl;
+//            LogTrace("/tmp/arcLog.csv") << "gop " << gopCount_ << std::endl;
+//            std::cout << "gop " << gopCount_ << std::endl;
+
         }
 
         if (currentPlayNo_ >= 0 &&
@@ -102,8 +104,11 @@ bool VideoPlayoutImpl::processSample(const boost::shared_ptr<const BufferSlot>& 
             if (!gopIsValid_) {
                 LogWarnC << "skip " << frameStr << ". invalid GOP (" << gopCount_
                          << ", " << currentPlayNo_ << ")" << std::endl;
-                std::cout << "Invalid GOP (" << gopCount_
-                          << ", " << currentPlayNo_ <<")" << std::endl;
+//                std::cout << "Invalid GOP (" << gopCount_
+//                          << ", " << currentPlayNo_ <<")" << std::endl;
+//                LogWarn("/tmp/arcLog.csv")
+//                        << "Invalid GOP (" << gopCount_
+//                        << ", " << currentPlayNo_ <<")" << std::endl;
             }
             else
                 LogWarnC << "skip " << frameStr
@@ -111,7 +116,7 @@ bool VideoPlayoutImpl::processSample(const boost::shared_ptr<const BufferSlot>& 
                     << std::endl;
 
             gopIsValid_ = false;
-            std::cout << "gopIsValid_ = " << gopIsValid_<< "(false)" << std::endl;
+//            std::cout << "gopIsValid_ = " << gopIsValid_<< "(false)" << std::endl;
 
             {
                 boost::lock_guard<boost::recursive_mutex> scopedLock(mutex_);
