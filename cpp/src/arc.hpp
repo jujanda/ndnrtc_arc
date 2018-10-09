@@ -28,7 +28,8 @@ namespace ndnrtc{
     };
 
     /**
-     * TODO: Write description
+     * TODO Write description
+     * TODO Write about observing in description
      * ARC assumes that representations are given in an ordered list, sorted by quality in ascending order
      */
      // TODO Inherit from ndnrtccomponent?
@@ -71,13 +72,13 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         bool metaFetched = false;
         int minimumThreadTime = 4000;
         int gopCounter = 0;
-        double arcStartTime = 0;
-        double lastThreadtoFetchChangeTime = 0;
+        uint64_t arcStartTime = 0;
+        uint64_t lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
         double counter3 = 0; // TODO delete this after debugging
-        double dashJS_lastSegmentMeasuredThroughput = -1; // TODO move this into DASH-JS class
-        double dashJS_lastSegmentCalculatedThroughput = 0; // TODO move this into DASH-JS class
+        double dashJS_lastSegmentMeasuredThroughput = -1;
+        double dashJS_lastSegmentCalculatedThroughput = 0;
 
         // IInterestQueueObserver method
         void onInterestIssued(const boost::shared_ptr<const ndn::Interest>&) override;
@@ -87,7 +88,6 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         void segmentRequestTimeout(const NamespaceInfo&) override { /*ignored*/ }
         void segmentNack(const NamespaceInfo&, int) override { /*ignored*/ }
         void segmentStarvation() override { /*ignored*/ }
-
 
         /**
          * This logic doesn't change the current representation at all. Used when ARC is disabled.
@@ -105,8 +105,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
          */
         std::string sequentialAdaption();
 
-
-    /**
+        /**
          * This adaption logic calculates a suggested bitrate for the next segment,
          * by using the calculation result from the last segment (low weight) and the
          * measured actual throughput of the last segment (high weight).

@@ -19,7 +19,6 @@ Arc::Arc(AdaptionLogic adaptionLogic,
         : selectedAdaptionLogic(adaptionLogic),
           sstorage_(storage)
 {
-    // TODO write about observing in description
     // TODO Threadinfo not delivered in meta data (only names) --> Find solution for that
     videoThread rep1, rep2, rep3;
     rep1.threadName = "low";
@@ -39,13 +38,15 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     threadToFetch = videoThreads.begin()->threadName;
     lastThreadToFetch = threadToFetch;
 
+    // TODO Should store pat in variable, ideally from config file
     // Prepare simple-logger
-    LogWarn("/tmp/arcLog.csv") << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog.csv") << "[StartTime]" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
 
 void Arc::setThreadsMeta(std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta) {
+    // TODO Evaluate if this is still needed
     threadsMeta_ = threadsMeta;
     metaFetched = true;
 /*    std::cout << "Meta fetched for arc" << std::endl;
@@ -71,10 +72,6 @@ void Arc::calculateThreadToFetch() {
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
-}
-
-void Arc::switchThread() {
-    //TODO Delete this method if no longer needed
 }
 
 
@@ -112,7 +109,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     if(wireSeg->isPacketHeaderSegment()){
 
         // Log arrival
-        LogWarn("/tmp/arcLog.csv") << "[incomingFrame]" << wireSeg->getData()->getName().toUri() << std::endl;
+        LogInfo("/tmp/arcLog.csv") << "[incomingFrame]" << wireSeg->getData()->getName().toUri() << std::endl;
 
         // Save time of arrival
         double now = ndn_getNowMilliseconds();
@@ -120,12 +117,10 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         // New frame started
         gopCounter++;
 
-        // TODO find out why 20 leads to no new keyframes send
-        // TODO use GopSize-1
         /*
          * Switch if the following criteria are met:
          *  - Adaption logic that switches is selected
-         *  - We are close to the next key frame (gopCounter)
+         *  - We are close to the next key frame (gopCounter) // TODO use GopSize-1
          *  - We would actually switch to a new thread
          *  - A minimum of time has passed since last switch
          */
@@ -138,8 +133,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // TODO Delete this after Debugging
             std::cout << "Setting threadToFetch = " << threadToFetch
                       << " (@ " << now - arcStartTime << "ms)" << std::endl;
-            LogWarn("/tmp/arcLog.csv") << "[switchingThread]" << threadToFetch << std::endl;
-
+            LogInfo("/tmp/arcLog.csv") << "[switchingThread]" << threadToFetch << std::endl;
 
             // TODO find out if this can be omitted (seems beneficial)
             pimpl->setThread(threadToFetch);
@@ -157,8 +151,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
             // TODO only use info from video segments (is this still necessary?)
 //            std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
-//            std::cout << "Keyframe Received (GOP = " << gopCounter << ")" << std::endl;
-            LogWarn("/tmp/arcLog.csv") << "[incomingKeyFrame]" << gopCounter << std::endl;
+            LogInfo("/tmp/arcLog.csv") << "[incomingKeyFrame]" << gopCounter << std::endl;
 
             // Get the timestamp for when the corresponding Interest was sent
             double prodTime;
@@ -167,8 +160,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             if(searchResult != sentInterests.end()) {
                 prodTime = searchResult->second;
             } else {
-                // TODO Change to real Error log message
-                std::cout << "Interest not found in map." << std::endl;
+                LogError("/tmp/arcLog.csv") << "Interest not found in map." << std::endl;
             }
 
             // TODO Find out why rtt keeps increasing over time (is it still?)
