@@ -64,7 +64,8 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         std::string threadToFetch;
         std::string lastThreadToFetch = "";
         int sequentialAdaptionThreadCounter = 0;
-        std::unordered_map<std::string, double> sentInterests;
+        std::unordered_map<std::string, uint64_t> sentInterests;
+        std::unordered_map<std::string, uint64_t> receivedData;
         RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
         std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta_;

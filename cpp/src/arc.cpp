@@ -40,7 +40,10 @@ Arc::Arc(AdaptionLogic adaptionLogic,
 
     // TODO Should store pat in variable, ideally from config file
     // Prepare simple-logger
-    LogInfo("/tmp/arcLog.csv") << "[StartTime]" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_overtimers.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_map.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_unansweredInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -80,7 +83,20 @@ AdaptionLogic Arc::getSelectedAdaptionLogic() {
 }
 
 void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & interest) {
+
+    // Log arrival
+    LogTrace("/tmp/arcLog.csv") << "[outgoingInterest]\t" << interest->getName().toUri() << std::endl;
+
+    // TODO delete this after debugging
     sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
+
+/*    // TODO Only do for segment headers of key frames
+    // Only do for key frame interests
+    std::string name = interest->getName().getSubName(ndnrtc::prefix_filter::Stream, 1).toUri();
+    if (name == "/k") {
+        sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
+    }*/
+
 
     // TODO delete this (only used for experiments)
 /*    std::string name = interest->getName().getSubName(ndnrtc::prefix_filter::Stream, 1).toUri();
@@ -97,6 +113,38 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
+    // Todo Delete this after debugging
+    uint64_t now = ndn_getNowMilliseconds();
+
+    // Get the timestamp for when the corresponding Interest was sent
+    uint64_t prodTime;
+    std::string name = wireSeg->getData()->getName().toUri();
+
+    // search 01
+    auto searchResult2 = receivedData.find(name);
+    if (searchResult2 == receivedData.end()) {
+        receivedData.insert(std::make_pair(name, ndn_getNowMilliseconds()));
+    } else {
+        LogError("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\talready received" << std::endl;
+    }
+
+    //search 02
+    auto searchResult = sentInterests.find(name);
+    if (searchResult != sentInterests.end()) {
+        prodTime = searchResult->second;
+        sentInterests.erase(searchResult);
+        LogTrace("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\terased" << std::endl;
+    } else if (searchResult2 == receivedData.end()) {
+        LogError("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\tnot found" << std::endl;
+    }
+
+    double rtt = (now - prodTime);
+    LogTrace("/tmp/arcLog.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
+    if (rtt > 5000) {
+        LogTrace("/tmp/arcLog_overtimers.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
+    }
+    // TODO Delete end
+
     if(wireSeg->getSegmentClass() == SegmentClass::Parity){
 //        std::cout << "Parity packet received" << std::endl;
     }
@@ -108,11 +156,9 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     // Only do once per frame
     if(wireSeg->isPacketHeaderSegment()){
 
-        // Log arrival
-        LogInfo("/tmp/arcLog.csv") << "[incomingFrame]" << wireSeg->getData()->getName().toUri() << std::endl;
-
+        // TODO Enable this after debugging
         // Save time of arrival
-        double now = ndn_getNowMilliseconds();
+//        uint64_t now = ndn_getNowMilliseconds();
 
         // New frame started
         gopCounter++;
@@ -131,9 +177,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
            now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
 
             // TODO Delete this after Debugging
-            std::cout << "Setting threadToFetch = " << threadToFetch
-                      << " (@ " << now - arcStartTime << "ms)" << std::endl;
-            LogInfo("/tmp/arcLog.csv") << "[switchingThread]" << threadToFetch << std::endl;
+            std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
+            LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
 
             // TODO find out if this can be omitted (seems beneficial)
             pimpl->setThread(threadToFetch);
@@ -151,19 +196,33 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
             // TODO only use info from video segments (is this still necessary?)
 //            std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
-            LogInfo("/tmp/arcLog.csv") << "[incomingKeyFrame]" << gopCounter << std::endl;
+//            LogTrace("/tmp/arcLog.csv") << "[incomingKeyFrame]" << gopCounter << std::endl;
 
-            // Get the timestamp for when the corresponding Interest was sent
+/*            // Get the timestamp for when the corresponding Interest was sent
             double prodTime;
             std::string name = wireSeg->getData()->getName().toUri();
             auto searchResult = sentInterests.find(name);
             if(searchResult != sentInterests.end()) {
                 prodTime = searchResult->second;
+                // TODO find error free way to delete items from the list after reading them (don't use key to delete)
+//                sentInterests.erase(searchResult->first);
             } else {
-                LogError("/tmp/arcLog.csv") << "Interest not found in map." << std::endl;
+                LogError("/tmp/arcLog.csv") << "[unknownData]\t" << "Interest not found in map." << std::endl;
+                std::cout << "[unknownData]\t" << "Interest not found in map." << std::endl;
+            }*/
+
+
+            // Logging map status
+            if (now - arcStartTime > 29000) {
+                for (auto item : sentInterests) {
+                    LogTrace("/tmp/arcLog_unansweredInterests.csv") << "[MapStatus]\t" << item.first << "\t" << item.second << std::endl;
+                }
+                std::cout << "[mapStatus]\t" << "Size = " << sentInterests.size() << std::endl;
+                LogTrace("/tmp/arcLog_map.csv") << "[MapStatus]\t" << "Size = " << sentInterests.size() << std::endl;
+                LogTrace("/tmp/arcLog_unansweredInterests.csv") << "[MapStatus]\t" << "========" << std::endl;
             }
 
-            // TODO Find out why rtt keeps increasing over time (is it still?)
+            // TODO Find out why rtt keeps increasing over time (maybe cause double was wrong data type for timestamps?)
 //            double now = ndn_getNowMilliseconds();
             double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
             long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit

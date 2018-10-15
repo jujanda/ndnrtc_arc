@@ -55,7 +55,9 @@ void VideoPlayoutImpl::stop()
     PlayoutImpl::stop();
     currentPlayNo_ = -1;
     gopCount_ = 0;
-    std::cout << "gopCount_ reset by stop()" << std::endl;
+    std::cout << "[gopCount]\t" << "gopCount_ reset by stop()" << std::endl;
+    LogTrace("/tmp/arcLog.csv") << "[gopCount]\t" << "gopCount_ reset by stop()" << std::endl;
+    LogTrace("/tmp/arcLog_overtimers.csv") << "[gopCount]\t" << "gopCount_ reset by stop()" << std::endl;
 }
 
 //******************************************************************************
@@ -92,7 +94,7 @@ bool VideoPlayoutImpl::processSample(const boost::shared_ptr<const BufferSlot>& 
 
             ++gopCount_;
 
-            LogTraceC << "gop " << gopCount_ << std::endl;
+//            LogTraceC << "gop " << gopCount_ << std::endl;
 //            LogTrace("/tmp/arcLog.csv") << "gop " << gopCount_ << std::endl;
 //            std::cout << "gop " << gopCount_ << std::endl;
 
