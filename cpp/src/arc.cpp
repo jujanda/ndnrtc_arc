@@ -270,11 +270,12 @@ std::string Arc::sequentialAdaption() {
     }
 
     // Reset counter to avoid overflow
-    if(sequentialAdaptionThreadCounter >= videoThreads.size()) {
+/*    if(sequentialAdaptionThreadCounter >= videoThreads.size()) {
         sequentialAdaptionThreadCounter = 0;
-    }
+    }*/
     // Set next thread to be the next one in the list of representations
-    threadToFetch = videoThreads[sequentialAdaptionThreadCounter].threadName;
+//    threadToFetch = videoThreads[sequentialAdaptionThreadCounter].threadName;
+    threadToFetch = videoThreads[videoThreadsOrder[sequentialAdaptionThreadCounter]].threadName;
     sequentialAdaptionThreadCounter++;
     return threadToFetch;
 }
