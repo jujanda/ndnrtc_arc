@@ -223,6 +223,7 @@ void registerPrefix(boost::shared_ptr<Face> &face, const KeyChainManager &keyCha
                             const boost::shared_ptr<const Interest> &interest,
                             Face &face, uint64_t, const boost::shared_ptr<const InterestFilter> &) {
                              LogTrace("") << "Unexpected incoming interest " << interest->getName() << std::endl;
+                             LogTrace("/tmp/arcLog_producerReceivedInterests.csv") << "Unexpected incoming interest " << interest->getName() << std::endl;
                          },
                          [&completed, &isDone](const boost::shared_ptr<const Name> &prefix) {
                              LogError("") << "Prefix registration failure (" << prefix << ")" << std::endl;

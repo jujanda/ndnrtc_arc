@@ -44,7 +44,10 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     LogInfo("/tmp/arcLog_overtimers.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_map.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_unansweredInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_consumerSentInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_producerReceivedInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_producerSentData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_consumerReceivedData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -87,6 +90,7 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 
     // Log arrival
     LogTrace("/tmp/arcLog.csv") << "[outgoingInterest]\t" << interest->getName().toUri() << std::endl;
+    LogTrace("/tmp/arcLog_consumerSentInterests.csv") << "[outgoingInterest]\t" << interest->getName().toUri() << std::endl;
 
     // TODO delete this after debugging
     sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
@@ -120,6 +124,9 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     // Get the timestamp for when the corresponding Interest was sent
     uint64_t prodTime;
     std::string name = wireSeg->getData()->getName().toUri();
+
+    // Todo Delete this after debugging
+    LogTrace("/tmp/arcLog_consumerReceivedData.csv") << "[incomingData]\t" << name << std::endl;
 
     // search 01
     auto searchResult2 = receivedData.find(name);
