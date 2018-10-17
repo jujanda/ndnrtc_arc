@@ -32,7 +32,7 @@ namespace ndnrtc{
      * TODO Write about observing in description
      * ARC assumes that representations are given in an ordered list, sorted by quality in ascending order
      */
-     // TODO Inherit from ndnrtccomponent?
+     // TODO Inherit from NdnRtcComponent
 class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQueueObserver
     {
     public:
@@ -80,6 +80,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         double counter3 = 0; // TODO delete this after debugging
         double dashJS_lastSegmentMeasuredThroughput = -1;
         double dashJS_lastSegmentCalculatedThroughput = 0;
+        int videoThreadsOrder [6] = {1,2,2,2,2,2}; // TODO Delete this after debugging
 
         // IInterestQueueObserver method
         void onInterestIssued(const boost::shared_ptr<const ndn::Interest>&) override;

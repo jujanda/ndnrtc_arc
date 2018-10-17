@@ -38,12 +38,13 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     threadToFetch = videoThreads.begin()->threadName;
     lastThreadToFetch = threadToFetch;
 
-    // TODO Should store pat in variable, ideally from config file
+    // TODO Should store path in variable, ideally from config file
     // Prepare simple-logger
     LogInfo("/tmp/arcLog.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_overtimers.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_map.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_unansweredInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_producerSentData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -58,7 +59,7 @@ void Arc::setThreadsMeta(std::map<std::string, boost::shared_ptr<NetworkData>> t
         std::cout << x.first
                   << ':'
                   << x.second->getLength()
-                  << std::endl ;
+                  << std::endl;
     }*/
 }
 

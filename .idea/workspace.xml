@@ -12,8 +12,9 @@
       <change beforePath="$PROJECT_DIR$/cpp/.libs/libndnrtc.so.0.0.0" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/.libs/libndnrtc.so.0.0.0" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/src/arc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/arc.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/src/arc.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/arc.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/video-playout-impl.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/video-playout-impl.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ndnrtc-reset.sh" beforeDir="false" afterPath="$PROJECT_DIR$/ndnrtc-reset.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/src/packet-publisher.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/packet-publisher.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/tests/loopback-consumer.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/tests/loopback-consumer.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/tests/loopback-producer.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/tests/loopback-producer.cfg" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -36,11 +37,29 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="video-playout-impl.cpp" pinned="false" current-in-tab="true">
+          <file leaf-file-name="video-playout-impl.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cpp/src/video-playout-impl.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="324">
-                  <caret line="62" column="37" selection-start-line="62" selection-start-column="37" selection-end-line="62" selection-end-column="37" />
+                <state relative-caret-position="846">
+                  <caret line="47" column="1" selection-start-line="47" selection-start-column="1" selection-end-line="47" selection-end-column="1" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="packet-publisher.hpp" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/cpp/src/packet-publisher.hpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="202">
+                  <caret line="138" column="50" selection-start-line="138" selection-start-column="50" selection-end-line="138" selection-end-column="50" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="video-coder.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/cpp/src/video-coder.cpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="3726">
+                  <caret line="207" selection-start-line="207" selection-end-line="207" />
                 </state>
               </provider>
             </entry>
@@ -52,8 +71,8 @@
           <file leaf-file-name="arc.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2754">
-                  <caret line="153" column="5" lean-forward="true" selection-start-line="153" selection-start-column="5" selection-end-line="153" selection-end-column="5" />
+                <state relative-caret-position="288">
+                  <caret line="271" column="16" selection-start-line="271" selection-start-column="16" selection-end-line="271" selection-end-column="16" />
                 </state>
               </provider>
             </entry>
@@ -61,8 +80,8 @@
           <file leaf-file-name="arc.hpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cpp/src/arc.hpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1350">
-                  <caret line="75" column="16" selection-start-line="75" selection-start-column="8" selection-end-line="75" selection-end-column="16" />
+                <state relative-caret-position="726">
+                  <caret line="82" column="48" selection-start-line="82" selection-start-column="48" selection-end-line="82" selection-end-column="48" />
                 </state>
               </provider>
             </entry>
@@ -130,6 +149,8 @@
         <option value="$PROJECT_DIR$/cpp/src/arcLogger.hpp" />
         <option value="$PROJECT_DIR$/cpp/src/interest-queue.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/video-playout-impl.cpp" />
+        <option value="$PROJECT_DIR$/cpp/src/video-coder.cpp" />
+        <option value="$PROJECT_DIR$/cpp/src/packet-publisher.hpp" />
         <option value="$PROJECT_DIR$/cpp/src/arc.hpp" />
         <option value="$PROJECT_DIR$/cpp/src/arc.cpp" />
       </list>
@@ -137,10 +158,10 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2626" />
-    <option name="y" value="-11" />
-    <option name="width" value="2495" />
-    <option name="height" value="1452" />
+    <option name="x" value="66" />
+    <option name="y" value="1069" />
+    <option name="width" value="1855" />
+    <option name="height" value="1092" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -273,27 +294,29 @@
       <workItem from="1538980928658" duration="17991000" />
       <workItem from="1539066503871" duration="7655000" />
       <workItem from="1539146442086" duration="11498000" />
-      <workItem from="1539597494872" duration="1412000" />
+      <workItem from="1539597494872" duration="1841000" />
+      <workItem from="1539668710615" duration="7769000" />
+      <workItem from="1539751492583" duration="1413000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="133963000" />
+    <option name="totallyTimeSpent" value="143574000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="2626" y="-11" width="2495" height="1452" extended-state="6" />
+    <frame x="66" y="-11" width="1855" height="1092" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14600882" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14570966" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="CMake" order="11" weight="0.3263473" />
+      <window_info anchor="bottom" id="CMake" order="11" weight="0.32479507" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" weight="0.32934132" />
-      <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Inspection Results" order="10" weight="0.32934132" />
@@ -313,38 +336,38 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cpp/src/interest-queue.hpp">
+    <entry file="file://$PROJECT_DIR$/cpp/src/video-playout-impl.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="936">
-          <caret line="52" column="76" selection-start-line="52" selection-start-column="76" selection-end-line="52" selection-end-column="76" />
+        <state relative-caret-position="846">
+          <caret line="47" column="1" selection-start-line="47" selection-start-column="1" selection-end-line="47" selection-end-column="1" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/interest-queue.cpp">
+    <entry file="file://$PROJECT_DIR$/cpp/src/video-coder.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2214">
-          <caret line="123" column="21" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
+        <state relative-caret-position="3726">
+          <caret line="207" selection-start-line="207" selection-end-line="207" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/packet-publisher.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2484">
+          <caret line="138" column="50" selection-start-line="138" selection-start-column="50" selection-end-line="138" selection-end-column="50" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3024">
-          <caret line="168" column="92" selection-start-line="168" selection-start-column="92" selection-end-line="168" selection-end-column="92" />
+        <state relative-caret-position="558">
+          <caret line="31" column="34" selection-start-line="31" selection-start-column="34" selection-end-line="31" selection-end-column="34" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/arc.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1224">
-          <caret line="68" column="37" selection-start-line="68" selection-start-column="37" selection-end-line="68" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/latency-control.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
-          <caret line="33" column="21" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
+        <state relative-caret-position="1476">
+          <caret line="82" column="48" selection-start-line="82" selection-start-column="48" selection-end-line="82" selection-end-column="48" />
         </state>
       </provider>
     </entry>
@@ -370,13 +393,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/packet-publisher.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3726">
-          <caret line="207" column="20" selection-start-line="207" selection-start-column="20" selection-end-line="207" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cpp/client/src/stat-collector.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="634">
@@ -399,20 +415,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt" />
-    <entry file="file://$PROJECT_DIR$/cpp/src/video-coder.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3888">
-          <caret line="216" column="18" selection-start-line="216" selection-start-column="18" selection-end-line="216" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/video-coder.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1926">
-          <caret line="107" column="42" selection-start-line="107" selection-start-column="22" selection-end-line="107" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/frame-buffer.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1219">
@@ -504,13 +506,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/frame-data.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1008">
-          <caret line="56" column="13" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/pipeline-control-state-machine.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3258">
@@ -549,13 +544,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1026">
           <caret line="57" column="9" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/ndnrtc-object.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="24" selection-start-line="15" selection-end-line="16" />
         </state>
       </provider>
     </entry>
@@ -629,24 +617,59 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/video-playout-impl.cpp">
+    <entry file="file://$PROJECT_DIR$/cpp/src/frame-data.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="738">
+          <caret line="56" column="13" selection-start-line="56" selection-start-column="13" selection-end-line="56" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/ndnrtc-object.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="324">
-          <caret line="62" column="37" selection-start-line="62" selection-start-column="37" selection-end-line="62" selection-end-column="37" />
+          <caret line="18" column="25" selection-start-line="18" selection-start-column="10" selection-end-line="18" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/video-playout-impl.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="846">
+          <caret line="47" column="1" selection-start-line="47" selection-start-column="1" selection-end-line="47" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/video-coder.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1324">
+          <caret line="107" column="42" selection-start-line="107" selection-start-column="22" selection-end-line="107" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/video-coder.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3726">
+          <caret line="207" selection-start-line="207" selection-end-line="207" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/packet-publisher.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="202">
+          <caret line="138" column="50" selection-start-line="138" selection-start-column="50" selection-end-line="138" selection-end-column="50" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/arc.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1350">
-          <caret line="75" column="16" selection-start-line="75" selection-start-column="8" selection-end-line="75" selection-end-column="16" />
+        <state relative-caret-position="726">
+          <caret line="82" column="48" selection-start-line="82" selection-start-column="48" selection-end-line="82" selection-end-column="48" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2754">
-          <caret line="153" column="5" lean-forward="true" selection-start-line="153" selection-start-column="5" selection-end-line="153" selection-end-column="5" />
+        <state relative-caret-position="288">
+          <caret line="271" column="16" selection-start-line="271" selection-start-column="16" selection-end-line="271" selection-end-column="16" />
         </state>
       </provider>
     </entry>
