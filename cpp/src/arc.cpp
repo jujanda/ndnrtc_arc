@@ -90,7 +90,7 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 
     // Log arrival
     LogTrace("/tmp/arcLog.csv") << "[outgoingInterest]\t" << interest->getName().toUri() << std::endl;
-    LogTrace("/tmp/arcLog_consumerSentInterests.csv") << "[outgoingInterest]\t" << interest->getName().toUri() << std::endl;
+    LogTrace("/tmp/arcLog_consumerSentInterests.csv") << "[ConsOutInterest]\t" << interest->getName().toUri() << std::endl;
 
     // TODO delete this after debugging
     sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
@@ -126,7 +126,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     std::string name = wireSeg->getData()->getName().toUri();
 
     // Todo Delete this after debugging
-    LogTrace("/tmp/arcLog_consumerReceivedData.csv") << "[incomingData]\t" << name << std::endl;
+    LogTrace("/tmp/arcLog_consumerReceivedData.csv") << "[ConsInData]\t" << name << std::endl;
 
     // search 01
     auto searchResult2 = receivedData.find(name);

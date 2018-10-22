@@ -137,7 +137,7 @@ class PacketPublisher : public NdnRtcComponent
                       << ndnSegment->getMetaInfo().getFreshnessPeriod() << "ms fp)"
                       << std::endl;
 
-            LogTrace("/tmp/arcLog_producerSentData.csv") << "[ProdOutData]\t" << "cached " << segmentName << std::endl;
+            LogTrace("/tmp/arcLog_producerSentData.csv") << "[ProdOutData]\t" << segmentName << std::endl;
         }
 
         if (!banPitClean)
