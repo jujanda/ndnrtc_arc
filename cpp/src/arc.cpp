@@ -48,6 +48,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     LogInfo("/tmp/arcLog_producerReceivedInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_producerSentData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_consumerReceivedData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_threadswitches.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -187,6 +188,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // TODO Delete this after Debugging
             std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
             LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
+            LogInfo("/tmp/arcLog_threadswitches.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
 
             // TODO find out if this can be omitted (seems beneficial)
             pimpl->setThread(threadToFetch);
@@ -274,6 +276,11 @@ std::string Arc::sequentialAdaption() {
     // Skip adaption if there already is a new threadToFetch determined
     if(lastThreadToFetch != threadToFetch) {
         return threadToFetch;
+    }
+
+    // Prevent index getting out of bounds
+    if (sequentialAdaptionThreadCounter >= sizeof(videoThreadsOrder) / sizeof(videoThreadsOrder[0])) {
+        sequentialAdaptionThreadCounter = 0;
     }
 
     // Reset counter to avoid overflow
