@@ -186,16 +186,23 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
            now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
 
             // TODO Delete this after Debugging
+            std::cout << "[values]" << "\t"
+                      << gopCounter << "\t"
+                      << threadToFetch << "\t"
+                      << lastThreadToFetch << "\t"
+                      << now - lastThreadtoFetchChangeTime << "\t"
+                      << minimumThreadTime << "\t"
+                      << std::endl;
             std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
             LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
             LogInfo("/tmp/arcLog_threadswitches.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
 
-            // TODO find out if this can be omitted (seems beneficial)
-            pimpl->setThread(threadToFetch);
-
             // Actually change threadPrefix in PipelineControlStateMachine
             pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
 
+            // Inform remote stream implementation of new threadName
+            pimpl->setThread(threadToFetch);
+            
             // Tidy up and prepare for next round
             lastThreadToFetch = threadToFetch;
             lastThreadtoFetchChangeTime = now;

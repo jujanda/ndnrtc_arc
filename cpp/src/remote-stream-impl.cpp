@@ -114,7 +114,6 @@ void RemoteStreamImpl::start(const std::string &threadName)
 void RemoteStreamImpl::setThread(const std::string &threadName)
 {
     threadName_ = threadName;
-    interestQueue_->reset();
 }
 
 void RemoteStreamImpl::stop()
