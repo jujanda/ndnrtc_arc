@@ -144,7 +144,6 @@ void RemoteVideoStreamImpl::setupPipelineControl()
                                               sampleEstimator_,
                                               sstorage_));
     pipelineControl_->setLogger(logger_);
-    // pipelineControl_->getMachine().setThreadPrefix("med");
     rtxController_->attach(pipelineControl_.get());
     segmentController_->attach(pipelineControl_.get());
     latencyControl_->registerObserver(pipelineControl_.get());

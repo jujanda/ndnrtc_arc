@@ -136,6 +136,8 @@ class PacketPublisher : public NdnRtcComponent
                       << ndnSegment->getDefaultWireEncoding().size() << "b wire, "
                       << ndnSegment->getMetaInfo().getFreshnessPeriod() << "ms fp)"
                       << std::endl;
+
+            LogTrace("/tmp/arcLog_producerSentData.csv") << "[ProdOutData]\t" << segmentName << std::endl;
         }
 
         if (!banPitClean)

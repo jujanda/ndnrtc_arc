@@ -864,8 +864,10 @@ PlaybackQueue::pop(ExtractSlot extract)
         extract(slot, playTime);
         (*sstorage_)[Indicator::AcquiredNum]++;
         
-        if (slot->getNameInfo().isDelta_)
-            buffer_->invalidatePrevious(slot->getPrefix());
+        if (slot->getNameInfo().isDelta_) {
+            // Disabled as workaround to enable threadswitching via ARC module
+//            buffer_->invalidatePrevious(slot->getPrefix());
+        }
         else
         {
             // TODO: invalidate old key frames

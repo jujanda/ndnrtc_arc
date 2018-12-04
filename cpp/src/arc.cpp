@@ -19,8 +19,6 @@ Arc::Arc(AdaptionLogic adaptionLogic,
         : selectedAdaptionLogic(adaptionLogic),
           sstorage_(storage)
 {
-    // TODO write about observing in description
-    // TODO Check out 'rate-adaption-module.hpp' for hints
     // TODO Threadinfo not delivered in meta data (only names) --> Find solution for that
     videoThread rep1, rep2, rep3;
     rep1.threadName = "low";
@@ -33,16 +31,30 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     videoThreads.emplace_back(rep2);
     videoThreads.emplace_back(rep3);
     this->pimpl = pimpl;
+    arcStartTime = ndn_getNowMilliseconds();
     lastThreadtoFetchChangeTime = ndn_getNowMilliseconds();
 
     // TODO set initial threadToFetch dynamically from config file | look how remote-stream-impl.cpp handles that
     threadToFetch = videoThreads.begin()->threadName;
+    lastThreadToFetch = threadToFetch;
 
+    // TODO Should store path in variable, ideally from config file
+    // Prepare simple-logger
+    LogInfo("/tmp/arcLog.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_overtimers.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_map.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_unansweredInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_consumerSentInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_producerReceivedInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_producerSentData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_consumerReceivedData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_threadswitches.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
 
 void Arc::setThreadsMeta(std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta) {
+    // TODO Evaluate if this is still needed
     threadsMeta_ = threadsMeta;
     metaFetched = true;
 /*    std::cout << "Meta fetched for arc" << std::endl;
@@ -51,11 +63,12 @@ void Arc::setThreadsMeta(std::map<std::string, boost::shared_ptr<NetworkData>> t
         std::cout << x.first
                   << ':'
                   << x.second->getLength()
-                  << std::endl ;
+                  << std::endl;
     }*/
 }
 
 void Arc::calculateThreadToFetch() {
+    // TODO Evaluate if this is still needed
     if (!metaFetched) {
         return;
     }
@@ -63,26 +76,33 @@ void Arc::calculateThreadToFetch() {
     switch (getSelectedAdaptionLogic()) {
         case AdaptionLogic::NoAdaption: threadToFetch = noAdaption(); break;
         case AdaptionLogic::Random: threadToFetch = randomAdaption(); break;
+        case AdaptionLogic::Sequential: threadToFetch = sequentialAdaption(); break;
         case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
-    // Force a minimum time between changes of representations
-    double now = ndn_getNowMilliseconds();
-    if (now - lastThreadtoFetchChangeTime >= minimumThreadTime && threadToFetch != lastThreadToFetch) {
-        std::cout << "Setting threadToFetch = " << threadToFetch << std::endl;
-        pimpl->setThread(threadToFetch);
-        pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
-        lastThreadToFetch = threadToFetch;
-        lastThreadtoFetchChangeTime = now;
-    }
 }
+
 
 AdaptionLogic Arc::getSelectedAdaptionLogic() {
     return selectedAdaptionLogic;
 }
 
 void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & interest) {
+
+    // Log arrival
+    LogTrace("/tmp/arcLog.csv") << "[outgoingInterest]\t" << interest->getName().toUri() << std::endl;
+    LogTrace("/tmp/arcLog_consumerSentInterests.csv") << "[ConsOutInterest]\t" << interest->getName().toUri() << std::endl;
+
+    // TODO delete this after debugging
     sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
+
+/*    // TODO Only do for segment headers of key frames
+    // Only do for key frame interests
+    std::string name = interest->getName().getSubName(ndnrtc::prefix_filter::Stream, 1).toUri();
+    if (name == "/k") {
+        sentInterests.insert(std::make_pair(interest->getName().toUri(), ndn_getNowMilliseconds()));
+    }*/
+
 
     // TODO delete this (only used for experiments)
 /*    std::string name = interest->getName().getSubName(ndnrtc::prefix_filter::Stream, 1).toUri();
@@ -99,27 +119,134 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
-    if(wireSeg->isPacketHeaderSegment() && wireSeg->getSampleClass() == SampleClass::Key) {
-        // TODO only use info from video segments (is this necessary?)
-//        std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
+    // Todo Delete this after debugging
+    uint64_t now = ndn_getNowMilliseconds();
 
-        double prodTime;
-        std::string name = wireSeg->getData()->getName().toUri();
-        auto search = sentInterests.find(name);
-        if(search != sentInterests.end()) {
-            prodTime = search->second;
-        } else {
-            std::cout << "Interest not found in map." << std::endl;
+    // Get the timestamp for when the corresponding Interest was sent
+    uint64_t prodTime;
+    std::string name = wireSeg->getData()->getName().toUri();
+
+    // Todo Delete this after debugging
+    LogTrace("/tmp/arcLog_consumerReceivedData.csv") << "[ConsInData]\t" << name << std::endl;
+
+    // search 01
+    auto searchResult2 = receivedData.find(name);
+    if (searchResult2 == receivedData.end()) {
+        receivedData.insert(std::make_pair(name, ndn_getNowMilliseconds()));
+    } else {
+        LogError("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\talready received" << std::endl;
+    }
+
+    //search 02
+    auto searchResult = sentInterests.find(name);
+    if (searchResult != sentInterests.end()) {
+        prodTime = searchResult->second;
+        sentInterests.erase(searchResult);
+        LogTrace("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\terased" << std::endl;
+    } else if (searchResult2 == receivedData.end()) {
+        LogError("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\tnot found" << std::endl;
+    }
+
+    double rtt = (now - prodTime);
+    LogTrace("/tmp/arcLog.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
+    if (rtt > 5000) {
+        LogTrace("/tmp/arcLog_overtimers.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
+    }
+    // TODO Delete end
+
+    if(wireSeg->getSegmentClass() == SegmentClass::Parity){
+//        std::cout << "Parity packet received" << std::endl;
+    }
+
+    if(wireSeg->getSampleClass() == SampleClass::Delta){
+//        std::cout << "Delta packet received" << std::endl;
+    }
+
+    // Only do once per frame
+    if(wireSeg->isPacketHeaderSegment()){
+
+        // TODO Enable this after debugging
+        // Save time of arrival
+//        uint64_t now = ndn_getNowMilliseconds();
+
+        // New frame started
+        gopCounter++;
+
+        /*
+         * Switch if the following criteria are met:
+         *  - Adaption logic that switches is selected
+         *  - We are close to the next key frame (gopCounter) // TODO use GopSize-1
+         *  - We would actually switch to a new thread
+         *  - A minimum of time has passed since last switch
+         */
+        if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption &&
+           gopCounter == 29 &&
+//           wireSeg->getSampleClass() == SampleClass::Key &&
+           threadToFetch != lastThreadToFetch &&
+           now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
+
+            // TODO Delete this after Debugging
+            std::cout << "[values]" << "\t"
+                      << gopCounter << "\t"
+                      << threadToFetch << "\t"
+                      << lastThreadToFetch << "\t"
+                      << now - lastThreadtoFetchChangeTime << "\t"
+                      << minimumThreadTime << "\t"
+                      << std::endl;
+            std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
+            LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
+            LogInfo("/tmp/arcLog_threadswitches.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
+
+            // Actually change threadPrefix in PipelineControlStateMachine
+            pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
+
+            // Inform remote stream implementation of new threadName
+            pimpl->setThread(threadToFetch);
+            
+            // Tidy up and prepare for next round
+            lastThreadToFetch = threadToFetch;
+            lastThreadtoFetchChangeTime = now;
         }
 
-        // TODO Find out why rtt keeps increasing over time
-        double now = ndn_getNowMilliseconds();
-        double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
-        long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
-        long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
-        dashJS_lastSegmentMeasuredThroughput = size / rtt; // bit/s
+        // Only do for key frames
+        if(wireSeg->getSampleClass() == SampleClass::Key) {
 
-        // TODO delete (only used for testing)
+            // TODO only use info from video segments (is this still necessary?)
+//            std::cout << "SegmentsReceivedNum = " << (*sstorage_)[statistics::Indicator::SegmentsReceivedNum] << std::endl;
+//            LogTrace("/tmp/arcLog.csv") << "[incomingKeyFrame]" << gopCounter << std::endl;
+
+/*            // Get the timestamp for when the corresponding Interest was sent
+            double prodTime;
+            std::string name = wireSeg->getData()->getName().toUri();
+            auto searchResult = sentInterests.find(name);
+            if(searchResult != sentInterests.end()) {
+                prodTime = searchResult->second;
+                // TODO find error free way to delete items from the list after reading them (don't use key to delete)
+//                sentInterests.erase(searchResult->first);
+            } else {
+                LogError("/tmp/arcLog.csv") << "[unknownData]\t" << "Interest not found in map." << std::endl;
+                std::cout << "[unknownData]\t" << "Interest not found in map." << std::endl;
+            }*/
+
+
+            // Logging map status
+            if (now - arcStartTime > 29000) {
+                for (auto item : sentInterests) {
+                    LogTrace("/tmp/arcLog_unansweredInterests.csv") << "[MapStatus]\t" << item.first << "\t" << item.second << std::endl;
+                }
+                std::cout << "[mapStatus]\t" << "Size = " << sentInterests.size() << std::endl;
+                LogTrace("/tmp/arcLog_map.csv") << "[MapStatus]\t" << "Size = " << sentInterests.size() << std::endl;
+                LogTrace("/tmp/arcLog_unansweredInterests.csv") << "[MapStatus]\t" << "========" << std::endl;
+            }
+
+            // TODO Find out why rtt keeps increasing over time (maybe cause double was wrong data type for timestamps?)
+//            double now = ndn_getNowMilliseconds();
+            double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
+            long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
+            long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
+            dashJS_lastSegmentMeasuredThroughput = size / rtt; // bit/s
+
+            // TODO delete (only used for testing)
 //        std::cout << "pT = " << prodTime;
 //        std::cout << ", cT = " << now;
 //        std::cout << ", size = " << size << " bit";
@@ -128,8 +255,11 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 //        std::cout << ", throughput = " << dashJS_lastSegmentMeasuredThroughput;
 //        std::cout << std::endl;
 
-        calculateThreadToFetch();
+            calculateThreadToFetch();
+            gopCounter = 0;
+        }
     }
+
 }
 
 std::string Arc::noAdaption() {
@@ -146,6 +276,28 @@ std::string Arc::randomAdaption() {
         threadToFetch = videoThreads[randNum].threadName;
     } while (threadToFetch == lastThreadToFetch);
 
+    return threadToFetch;
+}
+
+std::string Arc::sequentialAdaption() {
+    // Skip adaption if there already is a new threadToFetch determined
+    if(lastThreadToFetch != threadToFetch) {
+        return threadToFetch;
+    }
+
+    // Prevent index getting out of bounds
+    if (sequentialAdaptionThreadCounter >= sizeof(videoThreadsOrder) / sizeof(videoThreadsOrder[0])) {
+        sequentialAdaptionThreadCounter = 0;
+    }
+
+    // Reset counter to avoid overflow
+/*    if(sequentialAdaptionThreadCounter >= videoThreads.size()) {
+        sequentialAdaptionThreadCounter = 0;
+    }*/
+    // Set next thread to be the next one in the list of representations
+//    threadToFetch = videoThreads[sequentialAdaptionThreadCounter].threadName;
+    threadToFetch = videoThreads[videoThreadsOrder[sequentialAdaptionThreadCounter]].threadName;
+    sequentialAdaptionThreadCounter++;
     return threadToFetch;
 }
 

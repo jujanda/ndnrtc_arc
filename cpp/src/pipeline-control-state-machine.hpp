@@ -178,7 +178,7 @@ class PipelineControlStateMachine : public NdnRtcComponent
     void attach(IPipelineControlStateMachineObserver *);
     // not thread-safe! should be called on the same thread as dispatch(...)
     void detach(IPipelineControlStateMachineObserver *);
-    // //TODO description
+    // TODO description
     void setThreadPrefix (std::string threadName);
 
     static PipelineControlStateMachine defaultStateMachine(Struct ctrl);

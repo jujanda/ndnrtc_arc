@@ -55,6 +55,9 @@ void VideoPlayoutImpl::stop()
     PlayoutImpl::stop();
     currentPlayNo_ = -1;
     gopCount_ = 0;
+    std::cout << "[gopCount]\t" << "gopCount_ reset by stop()" << std::endl;
+    LogTrace("/tmp/arcLog.csv") << "[gopCount]\t" << "gopCount_ reset by stop()" << std::endl;
+    LogTrace("/tmp/arcLog_overtimers.csv") << "[gopCount]\t" << "gopCount_ reset by stop()" << std::endl;
 }
 
 //******************************************************************************
@@ -86,23 +89,36 @@ bool VideoPlayoutImpl::processSample(const boost::shared_ptr<const BufferSlot>& 
 
         if (!slot->getNameInfo().isDelta_)
         {
-            gopIsValid_ = true; 
+            gopIsValid_ = true;
+//            std::cout << "gopIsValid_ = " << gopIsValid_<< "(true)" << std::endl;
+
             ++gopCount_;
 
-            LogTraceC << "gop " << gopCount_ << std::endl;
+//            LogTraceC << "gop " << gopCount_ << std::endl;
+//            LogTrace("/tmp/arcLog.csv") << "gop " << gopCount_ << std::endl;
+//            std::cout << "gop " << gopCount_ << std::endl;
+
         }
 
         if (currentPlayNo_ >= 0 &&
             (hdr.playbackNo_ != currentPlayNo_+1 || !gopIsValid_))
         {
-            if (!gopIsValid_)
-                LogWarnC << "skip " << frameStr << ". invalid GOP" << std::endl;
+            if (!gopIsValid_) {
+                LogWarnC << "skip " << frameStr << ". invalid GOP (" << gopCount_
+                         << ", " << currentPlayNo_ << ")" << std::endl;
+//                std::cout << "Invalid GOP (" << gopCount_
+//                          << ", " << currentPlayNo_ <<")" << std::endl;
+//                LogWarn("/tmp/arcLog.csv")
+//                        << "Invalid GOP (" << gopCount_
+//                        << ", " << currentPlayNo_ <<")" << std::endl;
+            }
             else
                 LogWarnC << "skip " << frameStr
                     << " (expected " << currentPlayNo_+1 << "p)"
                     << std::endl;
 
             gopIsValid_ = false;
+//            std::cout << "gopIsValid_ = " << gopIsValid_<< "(false)" << std::endl;
 
             {
                 boost::lock_guard<boost::recursive_mutex> scopedLock(mutex_);

@@ -15,21 +15,24 @@
 #include "pipeline-control-state-machine.hpp"
 #include "pipeline-control.hpp"
 #include "interest-queue.hpp"
+#include "simple-log.hpp"
 
 namespace ndnrtc{
 
     enum class AdaptionLogic {
         NoAdaption,
         Random,
+        Sequential,
         Dash_JS,
         Thang
     };
 
     /**
-     * TODO: Write description
+     * TODO Write description
+     * TODO Write about observing in description
      * ARC assumes that representations are given in an ordered list, sorted by quality in ascending order
      */
-     // TODO Inherit from ndnrtccomponent?
+     // TODO Inherit from NdnRtcComponent
 class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQueueObserver
     {
     public:
@@ -39,6 +42,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         ~Arc();
 
         void calculateThreadToFetch();
+        void switchThread();
         void setThreadsMeta (std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta);
         AdaptionLogic getSelectedAdaptionLogic(); // TODO delete this?
 
@@ -59,19 +63,24 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         AdaptionLogic selectedAdaptionLogic = AdaptionLogic::NoAdaption;
         std::string threadToFetch;
         std::string lastThreadToFetch = "";
-        std::unordered_map<std::string, double> sentInterests;
+        int sequentialAdaptionThreadCounter = 0;
+        std::unordered_map<std::string, uint64_t> sentInterests;
+        std::unordered_map<std::string, uint64_t> receivedData;
         RemoteStreamImpl* pimpl;
         boost::shared_ptr<statistics::StatisticsStorage> sstorage_;
         std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta_;
 
         bool metaFetched = false;
         int minimumThreadTime = 4000;
-        double lastThreadtoFetchChangeTime = 0;
+        int gopCounter = 0;
+        uint64_t arcStartTime = 0;
+        uint64_t lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
         double counter3 = 0; // TODO delete this after debugging
-        double dashJS_lastSegmentMeasuredThroughput = -1; // TODO move this into DASH-JS class
-        double dashJS_lastSegmentCalculatedThroughput = 0; // TODO move this into DASH-JS class
+        double dashJS_lastSegmentMeasuredThroughput = -1;
+        double dashJS_lastSegmentCalculatedThroughput = 0;
+        int videoThreadsOrder [6] = {1,2,0,1,2,0}; // TODO Delete this after debugging
 
         // IInterestQueueObserver method
         void onInterestIssued(const boost::shared_ptr<const ndn::Interest>&) override;
@@ -82,7 +91,6 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         void segmentNack(const NamespaceInfo&, int) override { /*ignored*/ }
         void segmentStarvation() override { /*ignored*/ }
 
-
         /**
          * This logic doesn't change the current representation at all. Used when ARC is disabled.
          */
@@ -92,6 +100,12 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
          * This logic changes to a random representation out of all available ones
          */
         std::string randomAdaption();
+
+        /**
+         * This logic changes to the next highest representation available until it reaches
+         * the highest, after which ist loops back to the lowest and starts from anew.
+         */
+        std::string sequentialAdaption();
 
         /**
          * This adaption logic calculates a suggested bitrate for the next segment,
