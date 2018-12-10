@@ -11,10 +11,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/.libs/libndnrtc.so.0.0.0" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/.libs/libndnrtc.so.0.0.0" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cpp/src/arc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/arc.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/frame-buffer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/frame-buffer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/pipeline-control-state-machine.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/pipeline-control-state-machine.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cpp/src/remote-video-stream.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/remote-video-stream.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cpp/src/interest-queue.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/cpp/src/interest-queue.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,10 +25,10 @@
     <splitter split-orientation="horizontal" split-proportion="0.4669187">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="remote-stream-impl.cpp" pinned="false" current-in-tab="true">
+          <file leaf-file-name="remote-stream-impl.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="402">
+                <state relative-caret-position="2088">
                   <caret line="116" selection-start-line="116" selection-end-line="116" />
                 </state>
               </provider>
@@ -40,7 +37,7 @@
           <file leaf-file-name="frame-buffer.hpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cpp/src/frame-buffer.hpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="988">
+                <state relative-caret-position="6444">
                   <caret line="358" column="31" selection-start-line="358" selection-start-column="13" selection-end-line="358" selection-end-column="31" />
                 </state>
               </provider>
@@ -58,8 +55,44 @@
           <file leaf-file-name="frame-buffer.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/cpp/src/frame-buffer.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="676">
-                  <caret line="872" column="46" selection-start-line="872" selection-start-column="46" selection-end-line="872" selection-end-column="46" />
+                <state relative-caret-position="13158">
+                  <caret line="731" column="8" selection-start-line="731" selection-start-column="8" selection-end-line="731" selection-end-column="8" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="interest-queue.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/cpp/src/interest-queue.cpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="3114">
+                  <caret line="173" selection-start-line="173" selection-end-line="173" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="pipeliner.cpp" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.cpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="406">
+                  <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="8" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="pipeliner.hpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.hpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="576">
+                  <caret line="32" column="39" selection-start-line="32" selection-start-column="39" selection-end-line="32" selection-end-column="39" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="statistics.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/cpp/src/statistics.cpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="486">
+                  <caret line="27" column="26" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="26" />
                 </state>
               </provider>
             </entry>
@@ -71,8 +104,8 @@
           <file leaf-file-name="arc.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="728">
-                  <caret line="204" column="12" selection-start-line="204" selection-start-column="12" selection-end-line="204" selection-end-column="12" />
+                <state relative-caret-position="806">
+                  <caret line="51" column="95" selection-start-line="51" selection-start-column="95" selection-end-line="51" selection-end-column="95" />
                 </state>
               </provider>
             </entry>
@@ -99,7 +132,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>threadToFetch</find>
       <find>calculateThreadToFetch</find>
       <find>threadPrefix_</find>
       <find>setth</find>
@@ -127,6 +159,9 @@
       <find>transition</find>
       <find>buffer</find>
       <find>invalidatePrevious</find>
+      <find>DroppedKeyNum</find>
+      <find>express</find>
+      <find>processEntry</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -138,9 +173,7 @@
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/cpp/src/remote-stream-impl.hpp" />
         <option value="$PROJECT_DIR$/cpp/src/pipeliner.hpp" />
-        <option value="$PROJECT_DIR$/cpp/src/pipeliner.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/arcLogger.hpp" />
-        <option value="$PROJECT_DIR$/cpp/src/interest-queue.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/video-coder.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/packet-publisher.hpp" />
         <option value="$PROJECT_DIR$/cpp/client/src/main.cpp" />
@@ -150,16 +183,18 @@
         <option value="$PROJECT_DIR$/cpp/src/pipeline-control-state-machine.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/remote-video-stream.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/frame-buffer.hpp" />
-        <option value="$PROJECT_DIR$/cpp/src/frame-buffer.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp" />
+        <option value="$PROJECT_DIR$/cpp/src/frame-buffer.cpp" />
         <option value="$PROJECT_DIR$/cpp/src/arc.cpp" />
+        <option value="$PROJECT_DIR$/cpp/src/interest-queue.cpp" />
+        <option value="$PROJECT_DIR$/cpp/src/pipeliner.cpp" />
       </list>
     </option>
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2626" />
-    <option name="y" value="-11" />
+    <option name="x" value="66" />
+    <option name="y" value="1429" />
     <option name="width" value="2495" />
     <option name="height" value="1452" />
   </component>
@@ -169,6 +204,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -210,7 +246,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -314,17 +349,19 @@
       <workItem from="1543309882335" duration="7632000" />
       <workItem from="1543399188473" duration="1087000" />
       <workItem from="1543819399399" duration="3398000" />
+      <workItem from="1543913676637" duration="3549000" />
+      <workItem from="1544429684542" duration="932000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="216573000" />
+    <option name="totallyTimeSpent" value="221054000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="66" y="-11" width="2495" height="1452" extended-state="6" />
+    <frame x="66" y="1429" width="2495" height="1452" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14320096" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14320096" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="CMake" order="11" weight="0.3203593" />
       <window_info anchor="bottom" id="Event Log" order="8" side_tool="true" weight="0.32934132" />
@@ -353,20 +390,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3600">
-          <caret line="200" column="85" selection-start-line="200" selection-start-column="85" selection-end-line="200" selection-end-column="85" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/arc.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1476">
-          <caret line="82" column="44" selection-start-line="82" selection-start-column="44" selection-end-line="82" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cpp/client/src/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4086">
@@ -464,31 +487,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="32" column="39" selection-start-line="32" selection-start-column="39" selection-end-line="32" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="751">
-          <caret line="168" column="35" selection-start-line="168" selection-start-column="20" selection-end-line="168" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/interest-queue.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="618">
           <caret line="52" column="76" selection-start-line="52" selection-start-column="76" selection-end-line="52" selection-end-column="76" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/interest-queue.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="402">
-          <caret line="123" column="21" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
         </state>
       </provider>
     </entry>
@@ -668,29 +670,62 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/frame-buffer.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="988">
+        <state relative-caret-position="6444">
           <caret line="358" column="31" selection-start-line="358" selection-start-column="13" selection-end-line="358" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cpp/src/frame-buffer.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="676">
-          <caret line="872" column="46" selection-start-line="872" selection-start-column="46" selection-end-line="872" selection-end-column="46" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/remote-stream-impl.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="402">
+        <state relative-caret-position="2088">
           <caret line="116" selection-start-line="116" selection-end-line="116" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/client/src/stat-collector.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2478" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/statistics.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="27" column="26" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/frame-buffer.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13158">
+          <caret line="731" column="8" selection-start-line="731" selection-start-column="8" selection-end-line="731" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cpp/src/arc.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="728">
-          <caret line="204" column="12" selection-start-line="204" selection-start-column="12" selection-end-line="204" selection-end-column="12" />
+        <state relative-caret-position="806">
+          <caret line="51" column="95" selection-start-line="51" selection-start-column="95" selection-end-line="51" selection-end-column="95" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/interest-queue.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3114">
+          <caret line="173" selection-start-line="173" selection-end-line="173" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="32" column="39" selection-start-line="32" selection-start-column="39" selection-end-line="32" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cpp/src/pipeliner.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="406">
+          <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="8" />
         </state>
       </provider>
     </entry>

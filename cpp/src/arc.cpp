@@ -186,13 +186,13 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
            now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
 
             // TODO Delete this after Debugging
-            std::cout << "[values]" << "\t"
-                      << gopCounter << "\t"
-                      << threadToFetch << "\t"
-                      << lastThreadToFetch << "\t"
-                      << now - lastThreadtoFetchChangeTime << "\t"
-                      << minimumThreadTime << "\t"
-                      << std::endl;
+//            std::cout << "[values]" << "\t"
+//                      << gopCounter << "\t"
+//                      << threadToFetch << "\t"
+//                      << lastThreadToFetch << "\t"
+//                      << now - lastThreadtoFetchChangeTime << "\t"
+//                      << minimumThreadTime << "\t"
+//                      << std::endl;
             std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
             LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
             LogInfo("/tmp/arcLog_threadswitches.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
