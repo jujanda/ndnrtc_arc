@@ -2,64 +2,56 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+from collections import OrderedDict
 
 
 # ===================================
 
 # Define Variables
-requestedFrames = []
+publishedFrames = []
 playedFrames = []
 missingFrames = []
 
-# ???
-with open("./all.log","r") as input:
-	with open("./requestedFrames.log","wb") as output:
-		file = input.readlines()
-   		for line in file:
-   			linePosition = line.find("▷▷▷")
-   			if linePosition >= 0:
-   				record = line.split(" ")
-   				for item in record:
-   					itemPosition = item.find("/")
-   					if itemPosition >= 0:
-   						requestedFrames.append(item + "\n")
-
+# Parse log files to lists
+with open("./logs-original/producer-producer-camera.log","r") as input:
+   file = input.readlines()
+   for line in file:
+      linePosition = line.find("▻")
+      if linePosition >= 0:
+         record = line.split(" ")
+         publishedFrames.append(record[21] + "\t" + record [22])
 
 with open("./all.log","r") as input:
-	with open("./playedFrames.log","wb") as output:
 		file = input.readlines()
-   		for line in file:
-   			linePosition = line.find("●--")
-   			if linePosition >= 0:
-   				record = line.split(" ")
-   				for item in record:
-   					itemPosition = item.find("/")
-   					if itemPosition >= 0:
-   						playedFrames.append(item + "\n")
+		for line in file:
+			linePosition = line.find("●--")
+			if linePosition >= 0:
+				record = line.split(" ")
+				for item in record:
+					itemPosition = item.find("/")
+					if itemPosition >= 0:
+						playedFrames.append(item.split("/")[3])
 
 # Delete duplicates from list
-requestedFrames = list(set(requestedFrames))
-
-# Print key frames
-# for item in playedFrames:
-# 	if "k" in item:
-# 		print(item)
+publishedFrames = list(OrderedDict.fromkeys(publishedFrames))
 
 # Find missing frames
-for item in requestedFrames:
-	if item not in playedFrames:
-		missingFrames.append(item)
-		# missingFrames.append(item.split("/")[3] + "\n")
+for item in publishedFrames:
+	absoluteFrameNumber = item.split("\t")[1][:-1]
+	relativeFrameNumber = item.split("\t")[0][:-1]
+	if absoluteFrameNumber not in playedFrames:
+		if relativeFrameNumber not in playedFrames:
+			missingFrames.append(absoluteFrameNumber)
 
 # Write to files
-# with open("./requestedFrames.log","wb") as output:
-# 	for item in requestedFrames:
-# 		output.write(item)
+with open("./publishedFrames.log","wb") as output:
+   for item in publishedFrames:
+      output.write(item + "\n")
 
-# with open("./playedFrames.log","wb") as output:
-# 	for item in playedFrames:
-# 		output.write(item)
+with open("./playedFrames.log","wb") as output:
+	for item in playedFrames:
+		output.write(item + "\n")
 
 with open("./missingFrames.log","wb") as output:
 	for item in missingFrames:
-		output.write(item)
+		output.write(item + "\n")
