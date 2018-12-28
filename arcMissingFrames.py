@@ -4,9 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from collections import OrderedDict
 
-
-# ===================================
-
 # Define Variables
 publishedFrames = []
 playedFrames = []
