@@ -11,20 +11,15 @@
 
 # Create variables
 echo 'Create variables'
-PATH_IN="../../ndnrtc_testing"
-PATH_OUT="cpp/loopback"
+PATH_IN="../tests"
+PATH_OUT="../loopback"
 PATH_SRC=$(pwd)
 RES=256x144
 
 # Create folders
 echo 'Create folders'
-mkdir $PATH_IN/frames
 mkdir $PATH_OUT/frames
 mkdir $PATH_OUT/frames_padded
-
-# Extracting frames of input video as images
-# ffmpeg -i $PATH_IN/in_$RES.avi $PATH_IN/frames/%01d.png
-
 
 # Run analytics
 echo 'Run analytics'
@@ -49,12 +44,12 @@ ffmpeg -i $PATH_OUT/producer-camera.avi $PATH_OUT/frames/%01d.png
 # Fill in missing frames
 echo 'Fill in missing frames'
 # TODO create black frames fo all used resolutions and use $RES to take right one here
-python blackFrames.py $PATH_OUT/frames $PATH_OUT/frames_padded $PATH_IN/black_frame_$RES.png
+python blackFrames.py $RES
 
 # Reconstruct video from list of images
 echo 'Reconstruct video from list of images'
-ffmpeg -framerate 30 -i $PATH_OUT/frames/%01d.png -c:v libx264 -crf 0 -r 30 -preset fast -pix_fmt yuv420p $PATH_OUT/producer-camera_padded.avi
+ffmpeg -framerate 30 -i $PATH_OUT/frames_padded/%01d.png -c:v libx264 -crf 0 -r 30 -preset fast -pix_fmt yuv420p $PATH_OUT/producer-camera_padded.avi
 
 # FFMPEG, PSNR calculation
 echo 'FFMPEG, PSNR calculation'
-ffmpeg -s:v $RES -r 30 -i $PATH_IN/in_$RES.avi -s:v $RES -r 30 -i $PATH_OUT/producer-camera_padded.avi -lavfi "[0:v][1:v]psnr" -f null -
+ffmpeg -s $RES -r 30 -i $PATH_IN/in_$RES.avi -s $RES -r 30 -i $PATH_OUT/producer-camera_padded.avi -lavfi "[0:v][1:v]psnr" -f null -
