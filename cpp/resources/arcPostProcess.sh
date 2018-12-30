@@ -48,8 +48,9 @@ python blackFrames.py $RES
 
 # Reconstruct video from list of images
 echo 'Reconstruct video from list of images'
-ffmpeg -framerate 30 -i $PATH_OUT/frames_padded/%01d.png -c:v libx264 -crf 0 -r 30 -preset fast -pix_fmt yuv420p $PATH_OUT/producer-camera_padded.avi
+ffmpeg -framerate 30 -i $PATH_OUT/frames_padded/%01d.png -c:v libx264 -crf 0 -r 30 -preset ultrafast -pix_fmt argb $PATH_OUT/producer-camera_padded.avi
 
 # FFMPEG, PSNR calculation
 echo 'FFMPEG, PSNR calculation'
-ffmpeg -s $RES -r 30 -i $PATH_IN/in_$RES.avi -s $RES -r 30 -i $PATH_OUT/producer-camera_padded.avi -lavfi "[0:v][1:v]psnr" -f null -
+# ffmpeg -s $RES -r 30 -i $PATH_IN/in_$RES.avi -s $RES -r 30 -i $PATH_OUT/producer-camera_padded.avi -lavfi "[0:v][1:v]psnr" -f null -
+ffmpeg -r 30 -i $PATH_IN/in_$RES.avi  -r 30 -i $PATH_OUT/producer-camera_padded.avi -lavfi "[0:v][1:v]psnr" -f null -
