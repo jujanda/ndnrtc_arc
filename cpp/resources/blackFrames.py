@@ -21,7 +21,9 @@ with open("../loopback/missingFrames.log","r") as input:
 	for line in file:
 		missingFrames.append(line.strip())
 
-for file in os.listdir(frame_src):
+# Go through all the frames
+numberOfFrames = len(os.listdir(frame_src))
+while srcFrameCounter <= numberOfFrames:
 	if str(dstFrameCounter) in missingFrames:
 		# copy black frame
 		fileName1 = ""
