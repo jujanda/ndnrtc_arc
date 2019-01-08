@@ -82,3 +82,5 @@ cpp/ndnrtc-client
 cmake-build-debug
 *.raw
 *.avi
+
+cpp/resources/vmaf
