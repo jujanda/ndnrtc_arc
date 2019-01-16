@@ -34,7 +34,6 @@ while srcFrameCounter <= numberOfFrames:
 		
 	else:
 		# copy actual frame
-		# print("copy actual frame at " + str(dstFrameCounter))
 		fileName1 = str(srcFrameCounter) + ".png"
 		fileName2 = str(dstFrameCounter) + ".png"
 		copyfile(frame_src + "/" + fileName1, frame_dst + "/" + fileName2)
