@@ -36,7 +36,6 @@ publishedFrames = list(OrderedDict.fromkeys(publishedFrames))
 # Find missing frames
 for item in publishedFrames:
 	absoluteFrameNumber = item.split("\t")[1][:-1]
-	# relativeFrameNumber = item.split("\t")[0][:-1]
 	relativeFrameNumber = item.split("\t")[0]
 
 	if relativeFrameNumber not in playedFrames:
