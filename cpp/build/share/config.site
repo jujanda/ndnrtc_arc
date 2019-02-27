@@ -1,7 +1,0 @@
-CPPFLAGS="-DWEBRTC_POSIX -DDEBUG -g" CXXFLAGS="-DWEBRTC_POSIX -DDEBUG -g"
-NDNCPPDIR=/home/julian/Documents/ndnrtc-env/ndnrtc/cpp/../../ndn-cpp/build/include
-NDNCPPLIB=/home/julian/Documents/ndnrtc-env/ndnrtc/cpp/../../ndn-cpp/build/lib
-OPENFECDIR=/home/julian/Documents/ndnrtc-env/ndnrtc/cpp/../../openfec_v1.4.2
-WEBRTCDIR=/home/julian/Documents/ndnrtc-env/ndnrtc/cpp/../../webrtc-checkout/src
-LCONFIGDIR=/home/julian/Documents/ndnrtc-env/ndnrtc/cpp/../../libconfig/build/include
-LCONFIGLIB=/home/julian/Documents/ndnrtc-env/ndnrtc/cpp/../../libconfig/build/lib
