@@ -2,8 +2,8 @@
 
 # Create variables
 echo '> Creating variables'
-PATH_IN="../tests"
-PATH_OUT="../loopback"
+PATH_IN="tests"
+PATH_OUT="loopback"
 PATH_SRC=$(pwd)
 RES_W=256
 RES_H=144
@@ -18,15 +18,15 @@ mkdir $PATH_OUT/frames_padded
 # Run analytics
 echo '> Running analytics'
 cd $PATH_OUT
-git clone https://github.com/peetonn/ndnrtc-tools &>> $PATH_OUT/arc_PostProcess.log && export PATH=$PATH:$(pwd)/ndnrtc-tools &>> $PATH_OUT/arc_PostProcess.log
-prep-logs.sh &>> $PATH_OUT/arc_PostProcess.log
-../resources/report-loopback.sh &>> $PATH_OUT/arc_PostProcess.log
+git clone https://github.com/peetonn/ndnrtc-tools &>> arc_PostProcess.log && export PATH=$PATH:$(pwd)/ndnrtc-tools &>> arc_PostProcess.log
+prep-logs.sh &>> arc_PostProcess.log
+./resources/report-loopback.sh &>> arc_PostProcess.log
 cd $PATH_SRC
 echo '==================================' &>> $PATH_OUT/arc_PostProcess.log
 
 # Determine missing frames
 echo '> Determining missing frames'
-python arcMissingFrames.py &>> $PATH_OUT/arc_PostProcess.log
+python ./resources/arcMissingFrames.py &>> $PATH_OUT/arc_PostProcess.log
 echo '==================================' &>> $PATH_OUT/arc_PostProcess.log
 
 # Transforming .raw file into viewable format
@@ -41,7 +41,7 @@ echo '==================================' &>> $PATH_OUT/arc_PostProcess.log
 
 # Fill in missing frames
 echo '> Filling in missing frames'
-OFFSET=`python blackFrames.py $RES_W'x'$RES_H $FPS`
+OFFSET=`python ./resources/blackFrames.py $RES_W'x'$RES_H $FPS`
 echo '==================================' &>> $PATH_OUT/arc_PostProcess.log
 
 # Reconstruct video from list of images

@@ -9,16 +9,16 @@ fileName1 = ""
 fileName2 = ""
 resolution = sys.argv[1] 
 fps = sys.argv[2] 
-frame_src = "../loopback/frames"
-frame_dst = "../loopback/frames_padded"
-blk_frame_src = "../tests/black_frame_" + resolution + ".png"
+frame_src = "./loopback/frames"
+frame_dst = "./loopback/frames_padded"
+blk_frame_src = "./tests/black_frame_" + resolution + ".png"
 missingFrames = []
 srcFrameCounter = 1
 dstFrameCounter = 1
 blkFrameCounter = 0
 
 # Get missing frame numbers from file
-with open("../loopback/missingFrames.log","r") as input:
+with open("./loopback/missingFrames.log","r") as input:
    	file = input.readlines()
 	for line in file:
 		missingFrames.append(line.strip())
