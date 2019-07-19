@@ -7,7 +7,7 @@ PATH_OUT="loopback"
 PATH_SRC=$(pwd)
 RES_W=1280
 RES_H=720
-FPS=30
+FPS=24
 OFFSET=0
 
 # Create folders
