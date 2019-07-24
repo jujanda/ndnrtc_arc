@@ -49,6 +49,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     LogInfo("/tmp/arcLog_producerSentData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_consumerReceivedData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_threadswitches.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -126,10 +127,12 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     uint64_t prodTime;
     std::string name = wireSeg->getData()->getName().toUri();
 
+    double generationDelay = wireSeg->header().generationDelayMs_;
+
     // Todo Delete this after debugging
     LogTrace("/tmp/arcLog_consumerReceivedData.csv") << "[ConsInData]\t" << name << std::endl;
 
-    // search 01
+    // Search 01 - Check if data segment was already received; Save arrival timestamp in list if not.
     auto searchResult2 = receivedData.find(name);
     if (searchResult2 == receivedData.end()) {
         receivedData.insert(std::make_pair(name, ndn_getNowMilliseconds()));
@@ -137,7 +140,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         LogError("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\talready received" << std::endl;
     }
 
-    //search 02
+    //Search 02 - Search corresponding Interest, get its sending timestamp and erase it from list if found
     auto searchResult = sentInterests.find(name);
     if (searchResult != sentInterests.end()) {
         prodTime = searchResult->second;
@@ -147,7 +150,10 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         LogError("/tmp/arcLog_map.csv") << "[mapStatus]\t" << name << "\tnot found" << std::endl;
     }
 
-    double rtt = (now - prodTime);
+    // Calculate RTT 
+    // double rtt = std::max(1.0, (now - (prodTime + generationDelay)));
+    double rtt = now - (prodTime + generationDelay);
+
     LogTrace("/tmp/arcLog.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
     if (rtt > 5000) {
         LogTrace("/tmp/arcLog_overtimers.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
@@ -180,7 +186,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
          *  - A minimum of time has passed since last switch
          */
         if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption &&
-           gopCounter == 29 &&
+           gopCounter == 23 &&
 //           wireSeg->getSampleClass() == SampleClass::Key &&
            threadToFetch != lastThreadToFetch &&
            now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
@@ -241,19 +247,23 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
             // TODO Find out why rtt keeps increasing over time (maybe cause double was wrong data type for timestamps?)
 //            double now = ndn_getNowMilliseconds();
-            double rtt = (now - prodTime) / 1000; // Divide by 1000 to convert ms --> s // TODO already measured in drd-change-estimator?
-            long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
-            long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit // TODO is this better for size?
-            dashJS_lastSegmentMeasuredThroughput = size / rtt; // bit/s
+            // long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
+            long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit
+            
+            // WORKAROUND to dismiss the negative RTT values that pop up occasionally
+            if (rtt > 0) {
+                dashJS_lastSegmentMeasuredThroughput = size2 / rtt; // kbit/s 
+            }
 
             // TODO delete (only used for testing)
-//        std::cout << "pT = " << prodTime;
-//        std::cout << ", cT = " << now;
-//        std::cout << ", size = " << size << " bit";
-//        std::cout << ", size = " << size2 << " bit";
-//        std::cout << ", rtt = " << rtt;
-//        std::cout << ", throughput = " << dashJS_lastSegmentMeasuredThroughput;
-//        std::cout << std::endl;
+             LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[measured]\t"
+            << "pT = " << prodTime
+            << ", cT = " << now
+            // << ", size = " << size << " Bit"
+            << ", size = " << size2 << " Bit"
+            << ", rtt = " << rtt << " ms"
+            << ", throughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
+            << std::endl;
 
             calculateThreadToFetch();
             gopCounter = 0;
@@ -316,10 +326,11 @@ std::string Arc::dashJS() {
     dashJS_lastSegmentCalculatedThroughput = nextBn;
 
     // TODO delete (only used for testing)
-/*    std::cout << "nextbn = " << nextBn
-              << "\tbn = " << bn
-              << "\tbm = " << bm
-              << std::endl*/;
+    LogInfo("/tmp/arcLog_threadswitches.csv") << "[calculating]\t" 
+            << "nextbn = " << nextBn
+            << "\tbn = " << bn
+            << "\tbm = " << bm
+            << std::endl;
 
     // Rate selection
     for (auto selRep = videoThreads.rbegin(); selRep != videoThreads.rend(); ++selRep) {
