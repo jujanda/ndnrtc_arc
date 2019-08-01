@@ -10,6 +10,7 @@
 #include <remote-stream.hpp>
 #include <frame-data.hpp>
 #include <thread>
+#include <limits>
 
 using namespace ndnrtc;
 
@@ -22,11 +23,11 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     // TODO Threadinfo not delivered in meta data (only names) --> Find solution for that
     videoThread rep1, rep2, rep3;
     rep1.threadName = "low";
-    rep1.max_bitrate = "1000";
+    rep1.max_bitrate = "10000";
     rep2.threadName = "med";
-    rep2.max_bitrate = "1500";
+    rep2.max_bitrate = "15000";
     rep3.threadName = "high";
-    rep3.max_bitrate = "2000";
+    rep3.max_bitrate = "20000";
     videoThreads.emplace_back(rep1);
     videoThreads.emplace_back(rep2);
     videoThreads.emplace_back(rep3);
@@ -50,6 +51,8 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     LogInfo("/tmp/arcLog_consumerReceivedData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_threadswitches.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_networkSummedMeasurements.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_networkMeasurementValues.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -154,6 +157,9 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     // double rtt = std::max(1.0, (now - (prodTime + generationDelay)));
     double rtt = now - (prodTime + generationDelay);
 
+    // Save Size of segment
+    long size = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit
+
     LogTrace("/tmp/arcLog.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
     if (rtt > 5000) {
         LogTrace("/tmp/arcLog_overtimers.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
@@ -214,7 +220,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             lastThreadtoFetchChangeTime = now;
         }
 
-        // Only do for key frames
+        // Only do once per key frame
         if(wireSeg->getSampleClass() == SampleClass::Key) {
 
             // TODO only use info from video segments (is this still necessary?)
@@ -248,11 +254,11 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // TODO Find out why rtt keeps increasing over time (maybe cause double was wrong data type for timestamps?)
 //            double now = ndn_getNowMilliseconds();
             // long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
-            long size2 = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit
+            // long size = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit
             
             // WORKAROUND to dismiss the negative RTT values that pop up occasionally
             if (rtt > 0) {
-                dashJS_lastSegmentMeasuredThroughput = size2 / rtt; // kbit/s 
+                dashJS_lastSegmentMeasuredThroughput = size / rtt; // kbit/s 
             }
 
             // TODO delete (only used for testing)
@@ -260,7 +266,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             << "pT = " << prodTime
             << ", cT = " << now
             // << ", size = " << size << " Bit"
-            << ", size = " << size2 << " Bit"
+            << ", size = " << size << " Bit"
             << ", rtt = " << rtt << " ms"
             << ", throughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
             << std::endl;
@@ -270,6 +276,66 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         }
     }
 
+    // segment type visualisation
+    segmentTypeVisualisation_file.open("/tmp/arc_segmentTypeVisualisation.txt", std::ios_base::app);
+
+    if(wireSeg->getSampleClass() == SampleClass::Key) {
+        if(wireSeg->isPacketHeaderSegment()){
+            segmentTypeVisualisation_file << "\nK";
+            // process results of segments since last key frame header segment 
+            double smoothedThroughput = sizeSum / timeSum; // kbit/s
+            double extremeThroughput = sizeMin / timeMax; // kbit/s
+
+            // Print results before reset
+            LogInfo("/tmp/arcLog_networkSummedMeasurements.csv")
+                << "timeSum = " << timeSum
+                << ", sizeSum = " << sizeSum
+                << ", timeMax = " << timeMax
+                << ", sizeMin = " << sizeMin
+                << ", \tTP|sTP|eTP = " << dashJS_lastSegmentMeasuredThroughput
+                << "|" << smoothedThroughput
+                << "|" << extremeThroughput 
+                << " kBit/s"
+                << std::endl;
+
+            // reset values for new calculation
+            timeSum = 0;
+            sizeSum = 0;
+            timeMax = 0;
+            sizeMin = std::numeric_limits<double>::max();
+        } else {
+            segmentTypeVisualisation_file << "k";
+            // DO SOMETHING
+        }
+    }
+
+    if(wireSeg->getSampleClass() == SampleClass::Delta) {
+        if(wireSeg->isPacketHeaderSegment()){
+            segmentTypeVisualisation_file << "\nD";
+            // DO SOMETHING
+        } else {
+            segmentTypeVisualisation_file << "d";
+            // DO SOMETHING
+        }
+    }
+    segmentTypeVisualisation_file.close();
+
+    // WORKAROUND to dismiss the wrong RTT values that pop up occasionally
+    if (10000 > rtt && rtt > 0) {
+        // Sum up values for smoothed calculations
+        timeSum += rtt;
+        sizeSum += size;
+        // Track extreme values
+        if (timeMax < rtt) {timeMax = rtt;}
+        if (sizeMin > size) {sizeMin = size;}
+        
+        LogInfo("/tmp/arcLog_networkMeasurementValues.csv") << "[measured]\t"
+            << " rtt = " << rtt
+            << ", size = " << size
+            << ", timeSum = " << timeSum
+            << ", sizeSum = " << sizeSum
+            << std::endl;    
+    }
 }
 
 std::string Arc::noAdaption() {

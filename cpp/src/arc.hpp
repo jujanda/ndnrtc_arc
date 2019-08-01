@@ -81,6 +81,12 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         double dashJS_lastSegmentMeasuredThroughput = -1;
         double dashJS_lastSegmentCalculatedThroughput = 0;
         int videoThreadsOrder [6] = {1,2,0,1,2,0}; // TODO Delete this after debugging
+        std::ofstream segmentTypeVisualisation_file;
+        double timeSum = 0;
+        double sizeSum = 0;
+        double timeMax = 0;
+        double sizeMin = 0;
+
 
         // IInterestQueueObserver method
         void onInterestIssued(const boost::shared_ptr<const ndn::Interest>&) override;
