@@ -241,7 +241,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             }*/
 
 
-            // Logging map status
+/*            // Logging map status
             if (now - arcStartTime > 29000) {
                 for (auto item : sentInterests) {
                     LogTrace("/tmp/arcLog_unansweredInterests.csv") << "[MapStatus]\t" << item.first << "\t" << item.second << std::endl;
@@ -249,7 +249,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
                 std::cout << "[mapStatus]\t" << "Size = " << sentInterests.size() << std::endl;
                 LogTrace("/tmp/arcLog_map.csv") << "[MapStatus]\t" << "Size = " << sentInterests.size() << std::endl;
                 LogTrace("/tmp/arcLog_unansweredInterests.csv") << "[MapStatus]\t" << "========" << std::endl;
-            }
+            }*/
 
             // TODO Find out why rtt keeps increasing over time (maybe cause double was wrong data type for timestamps?)
 //            double now = ndn_getNowMilliseconds();
@@ -257,11 +257,12 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // long size = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit
             
             // WORKAROUND to dismiss the negative RTT values that pop up occasionally
+            // (It shouldn't be needed anymore, but oddly enough, it prevents values from becoming "-nan", so it stays for now)
             if (rtt > 0) {
-                dashJS_lastSegmentMeasuredThroughput = size / rtt; // kbit/s 
+                dashJS_lastSegmentMeasuredThroughput = sizeSum / timeSum; // kbit/s
             }
 
-            // TODO delete (only used for testing)
+/*            // TODO delete (only used for testing)
              LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[measured]\t"
             << "pT = " << prodTime
             << ", cT = " << now
@@ -269,9 +270,13 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             << ", size = " << size << " Bit"
             << ", rtt = " << rtt << " ms"
             << ", throughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
-            << std::endl;
+            << std::endl;*/
 
             calculateThreadToFetch();
+
+            // reset values for new calculation
+            timeSum = 0;
+            sizeSum = 0;
             gopCounter = 0;
         }
     }
@@ -282,40 +287,16 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     if(wireSeg->getSampleClass() == SampleClass::Key) {
         if(wireSeg->isPacketHeaderSegment()){
             segmentTypeVisualisation_file << "\nK";
-            // process results of segments since last key frame header segment 
-            double smoothedThroughput = sizeSum / timeSum; // kbit/s
-            double extremeThroughput = sizeMin / timeMax; // kbit/s
-
-            // Print results before reset
-            LogInfo("/tmp/arcLog_networkSummedMeasurements.csv")
-                << "timeSum = " << timeSum
-                << ", sizeSum = " << sizeSum
-                << ", timeMax = " << timeMax
-                << ", sizeMin = " << sizeMin
-                << ", \tTP|sTP|eTP = " << dashJS_lastSegmentMeasuredThroughput
-                << "|" << smoothedThroughput
-                << "|" << extremeThroughput 
-                << " kBit/s"
-                << std::endl;
-
-            // reset values for new calculation
-            timeSum = 0;
-            sizeSum = 0;
-            timeMax = 0;
-            sizeMin = std::numeric_limits<double>::max();
         } else {
             segmentTypeVisualisation_file << "k";
-            // DO SOMETHING
         }
     }
 
     if(wireSeg->getSampleClass() == SampleClass::Delta) {
         if(wireSeg->isPacketHeaderSegment()){
             segmentTypeVisualisation_file << "\nD";
-            // DO SOMETHING
         } else {
             segmentTypeVisualisation_file << "d";
-            // DO SOMETHING
         }
     }
     segmentTypeVisualisation_file.close();
@@ -325,16 +306,13 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
         // Sum up values for smoothed calculations
         timeSum += rtt;
         sizeSum += size;
-        // Track extreme values
-        if (timeMax < rtt) {timeMax = rtt;}
-        if (sizeMin > size) {sizeMin = size;}
         
-        LogInfo("/tmp/arcLog_networkMeasurementValues.csv") << "[measured]\t"
+/*        LogInfo("/tmp/arcLog_networkMeasurementValues.csv") << "[measured]\t"
             << " rtt = " << rtt
             << ", size = " << size
             << ", timeSum = " << timeSum
             << ", sizeSum = " << sizeSum
-            << std::endl;    
+            << std::endl; */   
     }
 }
 
