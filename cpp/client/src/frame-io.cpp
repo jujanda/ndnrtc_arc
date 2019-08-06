@@ -79,7 +79,7 @@ IFrameSink &FileSink::operator<<(const RawFrame &frame)
 
 FILE *FileSink::openFile_impl(string path)
 {
-    return fopen(path.c_str(), "wb");
+    return fopen(path.c_str(), "a+");
 }
 
 //******************************************************************************

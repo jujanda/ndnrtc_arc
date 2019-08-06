@@ -208,6 +208,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
             LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
             LogInfo("/tmp/arcLog_threadswitches.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
+            LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
+
 
             // Actually change threadPrefix in PipelineControlStateMachine
             pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
@@ -258,19 +260,18 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             
             // WORKAROUND to dismiss the negative RTT values that pop up occasionally
             // (It shouldn't be needed anymore, but oddly enough, it prevents values from becoming "-nan", so it stays for now)
-            if (rtt > 0) {
+            if (rtt > 0 && timeSum > 0) {
                 dashJS_lastSegmentMeasuredThroughput = sizeSum / timeSum; // kbit/s
             }
 
-/*            // TODO delete (only used for testing)
+            // TODO delete (only used for testing)
              LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[measured]\t"
             << "pT = " << prodTime
             << ", cT = " << now
-            // << ", size = " << size << " Bit"
-            << ", size = " << size << " Bit"
-            << ", rtt = " << rtt << " ms"
+            << ", sizeSum = " << sizeSum << " Bit"
+            << ", timeSum = " << timeSum << " ms"
             << ", throughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
-            << std::endl;*/
+            << std::endl;
 
             calculateThreadToFetch();
 
@@ -366,14 +367,20 @@ std::string Arc::dashJS() {
     double num1 = bn * w1;
     double num2 = bm * w2;
     double den = w1 + w2;
-    double nextBn = std::floor((num1 + num2) / den); // nextSegmentCalculatedThroughput
+    double tmp = (num1 + num2) / den;
+    double nextBn = std::floor(tmp);
+    // double nextBn = std::floor((num1 + num2) / den); // nextSegmentCalculatedThroughput
     dashJS_lastSegmentCalculatedThroughput = nextBn;
 
     // TODO delete (only used for testing)
-    LogInfo("/tmp/arcLog_threadswitches.csv") << "[calculating]\t" 
-            << "nextbn = " << nextBn
-            << "\tbn = " << bn
+    LogInfo("/tmp/arcLog_threadswitches.csv")
+            << "bn = " << bn
             << "\tbm = " << bm
+            // << "\tnum1 = " << num1
+            // << "\tnum2 = " << num2
+            // << "\tden = " << den
+            // << "\ttmp = " << tmp
+            << "\tnextBn = " << nextBn
             << std::endl;
 
     // Rate selection

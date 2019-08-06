@@ -71,16 +71,16 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta_;
 
         bool metaFetched = false;
-        int minimumThreadTime = 4000;
+        int minimumThreadTime = 10000;
         int gopCounter = 0;
         uint64_t arcStartTime = 0;
         uint64_t lastThreadtoFetchChangeTime = 0;
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
         double counter3 = 0; // TODO delete this after debugging
-        double dashJS_lastSegmentMeasuredThroughput = -1;
+        double dashJS_lastSegmentMeasuredThroughput = 0;
         double dashJS_lastSegmentCalculatedThroughput = 0;
-        int videoThreadsOrder [6] = {1,2,0,1,2,0}; // TODO Delete this after debugging
+        int videoThreadsOrder [5] = {1,2,0,1,2}; // TODO Delete this after debugging
         std::ofstream segmentTypeVisualisation_file;
         double timeSum = 0;
         double sizeSum = 0;

@@ -56,8 +56,8 @@ void RendererInternal::renderBGRAFrame(int64_t timestamp, uint frameNo, int widt
     if (!frame_.get())
         throw runtime_error("render buffer has not been initialized");
 
-    if (width != frame_->getWidth() || height != frame_->getHeight())
-        throw runtime_error("wrong frame size supplied");
+/*    if (width != frame_->getWidth() || height != frame_->getHeight())
+        throw runtime_error("wrong frame size supplied");*/
 
     // do whatever we need, i.e. drop frame, render it, write to file, etc.
     LogDebug("") << "received frame (" << width << "x" << height << ") at " 
