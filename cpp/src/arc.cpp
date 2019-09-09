@@ -384,12 +384,38 @@ std::string Arc::dashJS() {
             << std::endl;
 
     // Rate selection
-    for (auto selRep = videoThreads.rbegin(); selRep != videoThreads.rend(); ++selRep) {
+/*    for (auto selRep = videoThreads.rbegin(); selRep != videoThreads.rend(); ++selRep) {
         representationBitrate = std::stoi(selRep->max_bitrate);
         if (representationBitrate <= nextBn) {
             return selRep->threadName;
         }
-    }
+    }*/
+
+    // Rate selection (alternative DRAFT)
+    if (lastThreadToFetch == videoThreads[0].threadName) { // current: low
+        if (nextBn > 2500) {
+            return videoThreads[1].threadName; // med
+        } else {
+            return lastThreadToFetch; // low
+        }
+
+    } else if (lastThreadToFetch == videoThreads[1].threadName) { // current: med
+        if (nextBn < 1000) {
+            return videoThreads[0].threadName; // low
+        } else if (nextBn > 1500) {
+            return videoThreads[2].threadName; // high
+        } else {
+            return lastThreadToFetch; // med
+        }
+
+    }else if (lastThreadToFetch == videoThreads[2].threadName) { // current: high
+        if (nextBn < 1000) {
+            return videoThreads[1].threadName; // med
+        } else {
+            return lastThreadToFetch; // high
+        }
+    } 
+
 //    std::cout << "dashJS couldn't find a threadToFetch!" << std::endl;
     return threadToFetch;
 }
