@@ -132,7 +132,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
     double generationDelay = wireSeg->header().generationDelayMs_;
 
-    // Todo Delete this after debugging
+    // Todo Delete this after debugging (?)
     LogTrace("/tmp/arcLog_consumerReceivedData.csv") << "[ConsInData]\t" << name << std::endl;
 
     // Search 01 - Check if data segment was already received; Save arrival timestamp in list if not.
@@ -164,7 +164,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     if (rtt > 5000) {
         LogTrace("/tmp/arcLog_overtimers.csv") << "[incomingData]\t" << name << "\t" << rtt << std::endl;
     }
-    // TODO Delete end
+    // TODO Delete end (?)
 
     if(wireSeg->getSegmentClass() == SegmentClass::Parity){
 //        std::cout << "Parity packet received" << std::endl;
@@ -177,7 +177,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
     // Only do once per frame
     if(wireSeg->isPacketHeaderSegment()){
 
-        // TODO Enable this after debugging
+        // TODO Delete this after debugging
         // Save time of arrival
 //        uint64_t now = ndn_getNowMilliseconds();
 
@@ -208,7 +208,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
             LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
             LogInfo("/tmp/arcLog_threadswitches.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
-            LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
+            // LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
 
 
             // Actually change threadPrefix in PipelineControlStateMachine

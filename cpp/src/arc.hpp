@@ -71,7 +71,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta_;
 
         bool metaFetched = false;
-        int minimumThreadTime = 10000;
+        int minimumThreadTime = 4000; // in ms
         int gopCounter = 0;
         uint64_t arcStartTime = 0;
         uint64_t lastThreadtoFetchChangeTime = 0;
