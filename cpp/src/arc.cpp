@@ -272,12 +272,13 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
             // Log network info to file
             LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[measured]\t"
-            << "satT-sentT = " << fullKeyframeTime << " ms"
-            << ", sentT = " << prodTime
+            // << "satT-sentT = " << fullKeyframeTime << " ms"
+            // << ", sentT = " << prodTime
             // << ", cT = " << now
             // << ", sizeSum = " << sizeSum << " Bit"
             // << ", timeSum = " << timeSum << " ms"
-            << ", oldThroughput = " << old_dashJS_lastSegmentMeasuredThroughput << "kBit/s"
+            << "retransmissions = " << retransmissions
+            << ", oldThroughput = " << old_dashJS_lastSegmentMeasuredThroughput << " kBit/s"
             << ", newThroughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
             << std::endl;
 
@@ -287,6 +288,7 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             timeSum = 0;
             sizeSum = 0;
             gopCounter = 0;
+            retransmissions = 0;
 
             // WORKAROUND to dismiss invalid sending times
             if (now * 0.9 < prodTime && prodTime < now * 1.1) {
@@ -295,10 +297,10 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             } else {
                 // WORKAROUND Remember arriving time of first keyframe segment (next best thing available)
                 keyframeSendingtime = now;
-                LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[warning]\t"
+/*                LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[warning]\t"
                 << "the previous line and the next line contain wrong throuphut values, due to [" 
                 << prodTime << "]"
-                << std::endl;
+                << std::endl;*/
             }
         }
     }
@@ -337,6 +339,29 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             << std::endl; */   
     }
 }
+
+void Arc::segmentRequestTimeout(const NamespaceInfo&) {
+    //Do something
+    LogInfo("tmp/arcLog_unansweredInterests.csv") << "[warning]\t"
+    << "Request timeout happened!" << std::endl;
+}
+
+void Arc::segmentNack(const NamespaceInfo&, int) {
+    //Do something
+    LogInfo("tmp/arcLog_unansweredInterests.csv") << "[warning]\t"
+    << "Nack happened!" << std::endl;
+}
+
+void Arc::segmentStarvation() {
+    //Do something
+    LogInfo("tmp/arcLog_unansweredInterests.csv") << "[warning]\t"
+    << "Starvation happened!" << std::endl;
+}
+
+void Arc::onRetransmissionRequired(const std::vector<boost::shared_ptr<const ndn::Interest>>&) {
+    retransmissions += 1;
+}
+
 
 std::string Arc::noAdaption() {
     // Do nothing
@@ -402,6 +427,7 @@ std::string Arc::dashJS() {
             // << "\tden = " << den
             // << "\ttmp = " << tmp
             << "\tnextBn = " << nextBn
+            << "\tretransmissions = " << retransmissions
             << std::endl;
 
     // Rate selection
@@ -412,7 +438,7 @@ std::string Arc::dashJS() {
         }
     }*/
 
-    // Rate selection (alternative DRAFT)
+/*    // Rate selection (alternative DRAFT)
     if (lastThreadToFetch == videoThreads[0].threadName) { // current: low
         if (nextBn > 2500) {
             return videoThreads[1].threadName; // med
@@ -435,7 +461,33 @@ std::string Arc::dashJS() {
         } else {
             return lastThreadToFetch; // high
         }
+    } */
+
+        // Rate selection (another alternative DRAFT)
+    if (lastThreadToFetch == videoThreads[0].threadName) { // current: low
+        if (retransmissions < 10) {
+            return videoThreads[1].threadName; // med
+        } else {
+            return lastThreadToFetch; // low
+        }
+
+    } else if (lastThreadToFetch == videoThreads[1].threadName) { // current: med
+        if (retransmissions > 25) {
+            return videoThreads[0].threadName; // low
+        } else if (retransmissions < 10) {
+            return videoThreads[2].threadName; // high
+        } else {
+            return lastThreadToFetch; // med
+        }
+
+    }else if (lastThreadToFetch == videoThreads[2].threadName) { // current: high
+        if (retransmissions > 25) {
+            return videoThreads[1].threadName; // med
+        } else {
+            return lastThreadToFetch; // high
+        }
     } 
+    
 
 //    std::cout << "dashJS couldn't find a threadToFetch!" << std::endl;
     return threadToFetch;

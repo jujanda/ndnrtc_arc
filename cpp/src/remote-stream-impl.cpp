@@ -81,8 +81,12 @@ RemoteStreamImpl::RemoteStreamImpl(asio::io_service &io,
     bufferControl_->attach((InterestControl *)interestControl_.get());
     bufferControl_->attach((LatencyControl *)latencyControl_.get());
 
+    // rtx observer
+    rtxController_->attach(arc_.get());
+
     // interest queue
     interestQueue_->registerObserver(arc_.get());
+
 }
 
 bool RemoteStreamImpl::isMetaFetched() const

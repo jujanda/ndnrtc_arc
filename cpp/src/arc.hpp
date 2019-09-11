@@ -33,7 +33,9 @@ namespace ndnrtc{
      * ARC assumes that representations are given in an ordered list, sorted by quality in ascending order
      */
      // TODO Inherit from NdnRtcComponent
-class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQueueObserver
+class Arc : public ndnrtc::ISegmentControllerObserver, 
+            public ndnrtc::IInterestQueueObserver, 
+            public ndnrtc::IRtxObserver
     {
     public:
         Arc(AdaptionLogic adaptionLogic,
@@ -86,15 +88,19 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         double sizeSum = 0;
         double keyframeSendingtime = 0;
         double old_dashJS_lastSegmentMeasuredThroughput = 0;
+        int retransmissions = 0;
 
-        // IInterestQueueObserver method
+        // IInterestQueueObserver methods
         void onInterestIssued(const boost::shared_ptr<const ndn::Interest>&) override;
 
-        // ISegmentControllerObserver methods:
+        // ISegmentControllerObserver methods
         void segmentArrived(const boost::shared_ptr<WireSegment>&) override;
-        void segmentRequestTimeout(const NamespaceInfo&) override { /*ignored*/ }
-        void segmentNack(const NamespaceInfo&, int) override { /*ignored*/ }
-        void segmentStarvation() override { /*ignored*/ }
+        void segmentRequestTimeout(const NamespaceInfo&) override;
+        void segmentNack(const NamespaceInfo&, int) override;
+        void segmentStarvation() override;
+
+        // IRtxObserver methods
+        void onRetransmissionRequired(const std::vector<boost::shared_ptr<const ndn::Interest>>&) override;
 
         /**
          * This logic doesn't change the current representation at all. Used when ARC is disabled.
