@@ -13,15 +13,18 @@ def read_file(filename):
 	# go through every line in the file except the first two
 	for line in file.readlines()[2:]:
 
-		# split line at spaces
-		record = line.split(" ")
+		# ignore warning lines
+		if "[warning]" not in line:
 
-		# take second to last value
-		tmpTP = record[-2]
+			# split line at spaces
+			record = line.split(" ")
 
-		# add value and keep count
-		sumTP += float(tmpTP)
-		numOfTP += 1
+			# take second to last value
+			tmpTP = record[-2]
+
+			# add value and keep count
+			sumTP += float(tmpTP)
+			numOfTP += 1
 
 	# calulate average throughput
 	avgTP = sumTP / numOfTP

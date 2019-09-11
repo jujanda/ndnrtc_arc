@@ -123,13 +123,12 @@ void Arc::onInterestIssued(const boost::shared_ptr<const ndn::Interest> & intere
 
 void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
 
-    // Todo Delete this after debugging
+    // Get cutrrent timestamp
     uint64_t now = ndn_getNowMilliseconds();
 
-    // Get the timestamp for when the corresponding Interest was sent
+    // Prepare variables
     uint64_t prodTime;
     std::string name = wireSeg->getData()->getName().toUri();
-
     double generationDelay = wireSeg->header().generationDelayMs_;
 
     // Todo Delete this after debugging (?)

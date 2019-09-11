@@ -26,7 +26,7 @@ cd $PATH_RESULTS
 git clone https://github.com/peetonn/ndnrtc-tools &>> arc_PostProcess.log && export PATH=$PATH:$(pwd)/ndnrtc-tools &>> arc_PostProcess.log
 prep-logs.sh &>> arc_PostProcess.log
 $PATH_EXECUTE/resources/report-loopback.sh &>> arc_PostProcess.log
-sleep 2 && xkill -id `xprop -root _NET_ACTIVE_WINDOW | cut -d\# -f2` > /dev/null
+# sleep 2 && xkill -id `xprop -root _NET_ACTIVE_WINDOW | cut -d\# -f2` > /dev/null
 cd $PATH_EXECUTE
 echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
