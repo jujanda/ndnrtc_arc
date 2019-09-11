@@ -257,19 +257,28 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // long size = wireSeg->getData()->getContent().size() * 8; // convert from Byte to bit
             // long size = wireSeg->getData()->getDefaultWireEncoding().size() * 8;  // convert from Byte to bit
             
+
+            // Calculate the time it took for full key frame to arrive
+            double fullKeyframeTime = now - keyframeSendingtime;
+
+            // Calculate throuphut based on total kexframe sending time
+            dashJS_lastSegmentMeasuredThroughput = sizeSum / fullKeyframeTime; // kbit/s
+
             // WORKAROUND to dismiss the negative RTT values that pop up occasionally
             // (It shouldn't be needed anymore, but oddly enough, it prevents values from becoming "-nan", so it stays for now)
             if (rtt > 0 && timeSum > 0) {
-                dashJS_lastSegmentMeasuredThroughput = sizeSum / timeSum; // kbit/s
+                old_dashJS_lastSegmentMeasuredThroughput = sizeSum / timeSum; // kbit/s
             }
 
-            // TODO delete (only used for testing)
-             LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[measured]\t"
-            << "pT = " << prodTime
-            << ", cT = " << now
-            << ", sizeSum = " << sizeSum << " Bit"
-            << ", timeSum = " << timeSum << " ms"
-            << ", throughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
+            // Log network info to file
+            LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[measured]\t"
+            << "satT-sentT = " << fullKeyframeTime << " ms"
+            << ", sentT = " << prodTime
+            // << ", cT = " << now
+            // << ", sizeSum = " << sizeSum << " Bit"
+            // << ", timeSum = " << timeSum << " ms"
+            << ", oldThroughput = " << old_dashJS_lastSegmentMeasuredThroughput << "kBit/s"
+            << ", newThroughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
             << std::endl;
 
             calculateThreadToFetch();
@@ -278,6 +287,19 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             timeSum = 0;
             sizeSum = 0;
             gopCounter = 0;
+
+            // WORKAROUND to dismiss invalid sending times
+            if (now * 0.9 < prodTime && prodTime < now * 1.1) {
+                // Remember sending time of first keyframe segment
+                keyframeSendingtime = prodTime;  
+            } else {
+                // WORKAROUND Remember arriving time of first keyframe segment (next best thing available)
+                keyframeSendingtime = now;
+                LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[warning]\t"
+                << "the previous line and the next line contain wrong throuphut values, due to [" 
+                << prodTime << "]"
+                << std::endl;
+            }
         }
     }
 

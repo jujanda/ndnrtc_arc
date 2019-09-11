@@ -84,6 +84,8 @@ class Arc : public ndnrtc::ISegmentControllerObserver, public ndnrtc::IInterestQ
         std::ofstream segmentTypeVisualisation_file;
         double timeSum = 0;
         double sizeSum = 0;
+        double keyframeSendingtime = 0;
+        double old_dashJS_lastSegmentMeasuredThroughput = 0;
 
         // IInterestQueueObserver method
         void onInterestIssued(const boost::shared_ptr<const ndn::Interest>&) override;
