@@ -22,36 +22,34 @@ PATH_RESULTS=$PATH_EVALUATION'setting_'$SETTING/results/$RUN/
 # Delete empty results
 find $PATH_RESULTS -name 'producer-camera_*' -type 'f' -size 0k -delete
 
-# # Run analytics
-# echo '> Running analytics'
-# cd $PATH_RESULTS
-# git clone https://github.com/peetonn/ndnrtc-tools &>> arc_PostProcess.log && export PATH=$PATH:$(pwd)/ndnrtc-tools &>> arc_PostProcess.log
-# prep-logs.sh &>> arc_PostProcess.log
-# $PATH_EXECUTE/resources/report-loopback.sh &>> arc_PostProcess.log
-# # sleep 2 && xkill -id `xprop -root _NET_ACTIVE_WINDOW | cut -d\# -f2` > /dev/null
-# cd $PATH_EXECUTE
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+# Run analytics
+echo '> Running analytics'
+cd $PATH_RESULTS
+git clone https://github.com/peetonn/ndnrtc-tools &>> arc_PostProcess.log && export PATH=$PATH:$(pwd)/ndnrtc-tools &>> arc_PostProcess.log
+prep-logs.sh &>> arc_PostProcess.log
+$PATH_EXECUTE/resources/report-loopback.sh &>> arc_PostProcess.log
+# sleep 2 && xkill -id `xprop -root _NET_ACTIVE_WINDOW | cut -d\# -f2` > /dev/null
+cd $PATH_EXECUTE
+echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
-# # # Delete false missing frame entry
-# # echo '> Deleting missing frame entry'
-# # python resources/arcDeleteMissingFramesEntry.py $PATH_EVALUATION $SETTING $RUN
+# # Delete false missing frame entry
+# echo '> Deleting missing frame entry'
+# python resources/arcDeleteMissingFramesEntry.py $PATH_EVALUATION $SETTING $RUN
 
-# # Determine missing frames
-# echo '> Determining missing frames'
-# python resources/arcMissingFrames.py $PATH_RESULTS &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+# Determine missing frames
+echo '> Determining missing frames'
+python resources/arcMissingFrames.py $PATH_RESULTS &>> $PATH_RESULTS/arc_PostProcess.log
+echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
-# # Calculate average throughput
-# echo '> Calculating average throughput'
-# python resources/arcThroughput.py $PATH_EVALUATION $SETTING $RUN &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+# Calculate average throughput
+echo '> Calculating average throughput'
+python resources/arcThroughput.py $PATH_EVALUATION $SETTING $RUN &>> $PATH_RESULTS/arc_PostProcess.log
+echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
 # Extracting frames of output videos as images and combine them
 echo '> Extracting and combining frames'
-python resources/arcCombineResolutions.py $PATH_RESULTS $LOW_RES_W'x'$LOW_RES_H $MED_RES_W'x'$MED_RES_H $HIGH_RES_W'x'$HIGH_RES_H $FPS #&>> $PATH_RESULTS/arc_PostProcess.log
+python resources/arcCombineResolutions.py $PATH_RESULTS $LOW_RES_W'x'$LOW_RES_H $MED_RES_W'x'$MED_RES_H $HIGH_RES_W'x'$HIGH_RES_H $FPS &>> $PATH_RESULTS/arc_PostProcess.log
 # echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
-
-
 
 # # Transforming .raw file into viewable format
 # echo '> Transforming .raw file into viewable format'
@@ -96,6 +94,7 @@ python resources/arcCombineResolutions.py $PATH_RESULTS $LOW_RES_W'x'$LOW_RES_H 
 # echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
 # Shortcut for quick results
+echo '> Quick results:'
 python resources/arcCountMissingFrames.py $PATH_EVALUATION $SETTING $RUN
 python resources/arcThroughput.py $PATH_EVALUATION $SETTING $RUN
 ls -ahl $PATH_RESULTS | grep producer-camera.*
