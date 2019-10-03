@@ -11,6 +11,7 @@
 #include <ndnrtc/simple-log.hpp>
 
 #include "renderer.hpp"
+#include "string"
 
 using namespace std;
 
@@ -78,11 +79,13 @@ string RendererInternal::openSink(unsigned int width, unsigned int height)
     }
 
     stringstream sinkPath;
-    sinkPath << sinkName_  << "." << width << "x" << height;
+    sinkPath << sinkName_  << "_" << to_string(sinkCount) << "." << width << "x" << height;
 
     try
     {
         sink_ = createSink_(sinkPath.str());
+        sinkCount++;
+        std::cout << "sinkPath: " << sinkPath.str() << std::endl;
     }
     catch (const std::runtime_error& e)
     {

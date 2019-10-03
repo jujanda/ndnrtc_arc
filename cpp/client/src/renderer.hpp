@@ -59,6 +59,7 @@ private:
     std::string sinkName_;
     bool isDumping_, suppressBadSink_;
     unsigned int frameCount_;
+    int sinkCount = 0;
     
     std::string openSink(unsigned int width, unsigned int height);
     void closeSink();
