@@ -264,6 +264,9 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // Calculate throuphut based on total kexframe sending time
             dashJS_lastSegmentMeasuredThroughput = sizeSum / fullKeyframeTime; // kbit/s
 
+            // TODO [Experimental]
+            dashJS_lastSegmentMeasuredThroughput = retransmissions;
+
             // WORKAROUND to dismiss the negative RTT values that pop up occasionally
             // (It shouldn't be needed anymore, but oddly enough, it prevents values from becoming "-nan", so it stays for now)
             if (rtt > 0 && timeSum > 0) {
@@ -465,23 +468,23 @@ std::string Arc::dashJS() {
 
         // Rate selection (another alternative DRAFT)
     if (lastThreadToFetch == videoThreads[0].threadName) { // current: low
-        if (retransmissions < 10) {
+        if (retransmissions < 5) {
             return videoThreads[1].threadName; // med
         } else {
             return lastThreadToFetch; // low
         }
 
     } else if (lastThreadToFetch == videoThreads[1].threadName) { // current: med
-        if (retransmissions > 25) {
+        if (retransmissions > 10) {
             return videoThreads[0].threadName; // low
-        } else if (retransmissions < 10) {
+        } else if (retransmissions < 5) {
             return videoThreads[2].threadName; // high
         } else {
             return lastThreadToFetch; // med
         }
 
     }else if (lastThreadToFetch == videoThreads[2].threadName) { // current: high
-        if (retransmissions > 25) {
+        if (retransmissions > 1) {
             return videoThreads[1].threadName; // med
         } else {
             return lastThreadToFetch; // high
