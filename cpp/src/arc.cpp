@@ -188,13 +188,16 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
          *  - Adaption logic that switches is selected
          *  - We are close to the next key frame (gopCounter) // TODO use GopSize-1
          *  - We would actually switch to a new thread
-         *  - A minimum of time has passed since last switch
+         *  - We are at the end of a keyframe sequence
+         *  - A minimum of time has passed since last switch // TODO delete this (?)
          */
-        if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption &&
-           gopCounter == 23 &&
-//           wireSeg->getSampleClass() == SampleClass::Key &&
-           threadToFetch != lastThreadToFetch &&
-           now - lastThreadtoFetchChangeTime >= minimumThreadTime) {
+        if(getSelectedAdaptionLogic() != AdaptionLogic::NoAdaption
+            && gopCounter == 23 
+            // && wireSeg->getSampleClass() == SampleClass::Key 
+            && threadToFetch != lastThreadToFetch 
+            && keyFrameCounter == keyFrameSequenceLength 
+            // && now - lastThreadtoFetchChangeTime >= minimumThreadTime
+            ) {
 
             // TODO Delete this after Debugging
 //            std::cout << "[values]" << "\t"
@@ -207,8 +210,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             std::cout << "[switchingThread]\t" << threadToFetch << "\t" << now - arcStartTime << std::endl;
             LogInfo("/tmp/arcLog.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
             LogInfo("/tmp/arcLog_threadswitches.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
-            // LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
 
+            // LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[switchingThread]\t" << threadToFetch << std::endl;
 
             // Actually change threadPrefix in PipelineControlStateMachine
             pimpl->getPipelineControl()->getMachine().setThreadPrefix(threadToFetch);
@@ -261,8 +264,8 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // Calculate the time it took for full key frame to arrive
             double fullKeyframeTime = now - keyframeSendingtime;
 
-            // Calculate throuphut based on total kexframe sending time
-            dashJS_lastSegmentMeasuredThroughput = sizeSum / fullKeyframeTime; // kbit/s
+            // Calculate throuphut based on total keyframe sending time
+            // dashJS_lastSegmentMeasuredThroughput = sizeSum / fullKeyframeTime; // kbit/s
 
             // TODO [Experimental]
             dashJS_lastSegmentMeasuredThroughput = retransmissions;
@@ -285,14 +288,22 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             << ", newThroughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
             << std::endl;
 
-            calculateThreadToFetch();
+            // Check for end of keyframe sequence
+            if (keyFrameCounter >= keyFrameSequenceLength) { 
+                dashJS_lastSegmentMeasuredThroughput = retransmissions;
+                calculateThreadToFetch();
+                retransmissions = 0;
+                keyFrameCounter = 0;
+            }
 
-            // reset values for new calculation
+            // Reset values
             timeSum = 0;
             sizeSum = 0;
             gopCounter = 0;
-            retransmissions = 0;
 
+            // Increment counters
+            keyFrameCounter++ ;
+            
             // WORKAROUND to dismiss invalid sending times
             if (now * 0.9 < prodTime && prodTime < now * 1.1) {
                 // Remember sending time of first keyframe segment
@@ -305,6 +316,11 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
                 << prodTime << "]"
                 << std::endl;*/
             }
+
+/*            LogInfo("/tmp/arcLog_threadswitches.csv") 
+                << "\tkeyFramecounter = " << keyFrameCounter 
+                << std::endl;*/
+
         }
     }
 
@@ -466,30 +482,44 @@ std::string Arc::dashJS() {
         }
     } */
 
-        // Rate selection (another alternative DRAFT)
+/*        // Rate selection (another alternative DRAFT)
     if (lastThreadToFetch == videoThreads[0].threadName) { // current: low
-        if (retransmissions < 5) {
+        if (nextBn < 20) {
             return videoThreads[1].threadName; // med
         } else {
             return lastThreadToFetch; // low
         }
 
     } else if (lastThreadToFetch == videoThreads[1].threadName) { // current: med
-        if (retransmissions > 10) {
+        if (nextBn > 40) {
             return videoThreads[0].threadName; // low
-        } else if (retransmissions < 5) {
+        } else if (nextBn < 20) {
             return videoThreads[2].threadName; // high
         } else {
             return lastThreadToFetch; // med
         }
 
-    }else if (lastThreadToFetch == videoThreads[2].threadName) { // current: high
-        if (retransmissions > 1) {
+    } else if (lastThreadToFetch == videoThreads[2].threadName) { // current: high
+        if (nextBn > 4) {
             return videoThreads[1].threadName; // med
         } else {
             return lastThreadToFetch; // high
         }
-    } 
+    } */
+
+
+    // Rate selection (yet another DRAFT)
+    if (nextBn > threadSwitchThreshold) {
+        // switch up
+        if (lastThreadToFetch == videoThreads[0].threadName) { return videoThreads[1].threadName; } // low --> med
+        else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[2].threadName; } // med --> high
+
+    } else {
+        //switch down
+        if (lastThreadToFetch == videoThreads[2].threadName) { return videoThreads[1].threadName; } // high --> med
+        else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[0].threadName; } // med --> low
+    }
+
     
 
 //    std::cout << "dashJS couldn't find a threadToFetch!" << std::endl;
