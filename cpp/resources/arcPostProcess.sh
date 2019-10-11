@@ -77,15 +77,17 @@ python resources/arcCombineResolutions.py $PATH_RESULTS $LOW_RES_W'x'$LOW_RES_H 
 # ffmpeg -ss $OFFSET -i $PATH_RESULTS/producer-camera_padded.avi -c:v libx264 $PATH_RESULTS/producer-camera_padded'_adjusted'.avi &>> $PATH_RESULTS/arc_PostProcess.log
 # echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
-# # FFMPEG, PSNR calculation
-# echo '> Calculating PSNR'
-# ffmpeg -i $PATH_RESULTS/producer-camera_padded'_adjusted'.avi -i $PATH_RESULTS/in_$LOW_RES_W'x'$LOW_RES_H'_adjusted'.avi -lavfi  psnr=$PATH_RESULTS/arc_psnr.log -f null - &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+# FFMPEG, PSNR calculation
+echo '> Calculating PSNR'
+# ffmpeg -i /media/julian/extHD/setting_87/results/1/combined.avi -f rawvideo -vcodec rawvideo -s 1280x720 -r 24 -pix_fmt argb -i /home/nfd/ndnrtc_arc/cpp/tests/in_1280x720.raw -lavfi  psnr=/media/julian/extHD/setting_87/results/1/arc_psnr.log -f null -
+ffmpeg -i $PATH_RESULTS/combined.avi -f rawvideo -vcodec rawvideo -s $HIGH_RES_W'x'$HIGH_RES_H -r $FPS -pix_fmt argb -i $PATH_IN/in_1280x720.raw -lavfi  psnr=$PATH_RESULTS/arc_psnr.log -f null - &>> $PATH_RESULTS/arc_PostProcess.log
+echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
-# # FFMPEG, SSIM calculation
-# echo '> Calculating SSIM'
-# ffmpeg -i $PATH_RESULTS/producer-camera_padded'_adjusted'.avi -i $PATH_RESULTS/in_$LOW_RES_W'x'$LOW_RES_H'_adjusted'.avi -lavfi  ssim=$PATH_RESULTS/arc_ssim.log -f null - &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+# FFMPEG, SSIM calculation
+echo '> Calculating SSIM'
+# ffmpeg -i /media/julian/extHD/setting_87/results/1/combined.avi -f rawvideo -vcodec rawvideo -s 1280x720 -r 24 -pix_fmt argb -i /home/nfd/ndnrtc_arc/cpp/tests/in_1280x720.raw -lavfi  ssim=/media/julian/extHD/setting_87/results/1/arc_ssim.log -f null -
+ffmpeg -i $PATH_RESULTS/combined.avi -f rawvideo -vcodec rawvideo -s $HIGH_RES_W'x'$HIGH_RES_H -r $FPS -pix_fmt argb -i $PATH_IN/in_1280x720.raw -lavfi  ssim=$PATH_RESULTS/arc_ssim.log -f null - &>> $PATH_RESULTS/arc_PostProcess.log
+echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
 # # FFMPEG, VMAF calculation
 # echo '> Calculating VMAF'
