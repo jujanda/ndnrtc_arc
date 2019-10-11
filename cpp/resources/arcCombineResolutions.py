@@ -38,19 +38,26 @@ for vid in listOfVids:
 	num = tmp.split(".")[0] # 0
 	res = tmp.split(".")[1] # 1280x720
 	os.system("ffmpeg -f rawvideo -vcodec rawvideo -s " + res + " -r " + FPS + " -vsync 0 -pix_fmt argb -i " + vid + " " + PATH + "frames/" + num + "/%01d.png")
+	
+	# DEBUG messages
+	DIR = PATH + "frames/" + num
+	print "Frames in folder: " + str(len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))
+
 
 # Initialize counters
 absolute = 0;
 lineCounter = 0;
 lastQuality = ""
-folderCounter = -1
+folderCounter = 0
 inFolderCounter = 1
+correctEntry = True
+firstEntry = True
 
-# Get total number of frames
+# Get total number of frames and played frames
 numberOfFrames = file_len(PATH + "publishedFrames.log")
-print "numberOfFrames = " +  str(numberOfFrames)
 numberOfPlayedFrames = file_len(PATH + "playedFrames.log")
-print "numberOfPlayedFrames = " +  str(numberOfPlayedFrames)
+# print "numberOfFrames = " +  str(numberOfFrames)
+# print "numberOfPlayedFrames = " +  str(numberOfPlayedFrames)
 
 # go through played frames, check for absolute numbers (last element split by "\t")
 with open(PATH + "playedFrames.log","r") as input:
@@ -65,9 +72,23 @@ with open(PATH + "playedFrames.log","r") as input:
 		quality = tmp[1] # high
 
 		# Check for quality switch
-		if quality != lastQuality:
-			folderCounter += 1
-			inFolderCounter = 1
+		if (quality != lastQuality):
+
+			# Make sure current folder is empty (workaround for losing big chunks of frames in a representation)
+			# From https://stackoverflow.com/questions/2632205/how-to-count-the-number-of-files-in-a-directory-using-python
+			DIR = PATH + "frames/" + str(folderCounter)
+			if len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]) == 0: 
+
+				# Switch folders
+				folderCounter += 1
+				inFolderCounter = 1
+
+			elif not firstEntry:
+				# Reset quality (avoid switching to false one)
+				quality = lastQuality
+				correctEntry = False
+				# print "false entry detected: " + str(line) + "\tfolder = " + str(folderCounter) + "\tquality = " + quality
+
 
 		# Check if frame at current absolute number was played
 		if absolute != int(line[-1]): # 73
@@ -78,30 +99,38 @@ with open(PATH + "playedFrames.log","r") as input:
 				# Copy last frame
 				# cp /frames/combined/72.png /frames/combined/73.png
 				os.system("cp " + PATH + "frames/combined/" + str((absolute - 1)) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png")
+				# print("cp " + PATH + "frames/combined/" + str((absolute - 1)) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png" + " (frame not played)")
 			else:
 				# Copy first frame that got actually played 
 				# cp frames/0/69.png frames/combined/73.png
 				os.system("cp " + PATH + "frames/0/" + str(inFolderCounter) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png")
+				# print("cp " + PATH + "frames/0/" + str(inFolderCounter) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png")
 		else:
 			# Frame was played
 
 			# Check if frame is available as file
-			if os.path.isfile(PATH + "frames/" + str(folderCounter) + "/" + str(inFolderCounter) + ".png"):
+			if os.path.isfile(PATH + "frames/" + str(folderCounter) + "/" + str(inFolderCounter) + ".png") and correctEntry:
 				# Fetch appropriate frame 
 				# mv frames/0/69.png frames/combined/73.png
 				subprocess.call("mv " + PATH + "frames/" + str(folderCounter) + "/" + str(inFolderCounter) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png", shell=True)
+				# print("mv " + PATH + "frames/" + str(folderCounter) + "/" + str(inFolderCounter) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png")
+
+				# Increment counter
+				inFolderCounter += 1			
 			else:
 				# Copy last frame
 				# cp /frames/combined/72.png /frames/combined/73.png
 				os.system("cp " + PATH + "frames/combined/" + str((absolute - 1)) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png")
+				# print("cp " + PATH + "frames/combined/" + str((absolute - 1)) + ".png " + PATH + "frames/combined/" + str(absolute) + ".png" + " (frame played but missing)")
 
-			# Increment counters
+			# Increment counter
 			lineCounter += 1
-			inFolderCounter += 1
-
+			
 		# Clean up
 		absolute += 1
 		lastQuality = quality
+		firstEntry = False
+		correctEntry = True
 		
 		# Fail safe break
 		if lineCounter >= numberOfPlayedFrames:
