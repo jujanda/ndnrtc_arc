@@ -53,6 +53,7 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_networkSummedMeasurements.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_networkMeasurementValues.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_retransmissions.csv") << "[StartTime]\t" << arcStartTime << std::endl;
 }
 
 Arc::~Arc() = default;
@@ -377,8 +378,13 @@ void Arc::segmentStarvation() {
     << "Starvation happened!" << std::endl;
 }
 
-void Arc::onRetransmissionRequired(const std::vector<boost::shared_ptr<const ndn::Interest>>&) {
-    retransmissions += 1;
+void Arc::onRetransmissionRequired(const std::vector<boost::shared_ptr<const ndn::Interest>>& interest) {
+
+    for(int i = 0; i < interest.size(); i++) {
+        LogTrace("/tmp/arcLog_retransmissions.csv") << interest[i]->getName().toUri() << std::endl;
+    } 
+
+    retransmissions += interest.size();
 }
 
 
@@ -440,13 +446,13 @@ std::string Arc::dashJS() {
     // TODO delete (only used for testing)
     LogInfo("/tmp/arcLog_threadswitches.csv")
             << "bn = " << bn
-            << "\tbm = " << bm
+            << " bm = " << bm
             // << "\tnum1 = " << num1
             // << "\tnum2 = " << num2
             // << "\tden = " << den
             // << "\ttmp = " << tmp
-            << "\tnextBn = " << nextBn
-            << "\tretransmissions = " << retransmissions
+            << " nextBn = " << nextBn
+            // << "\tretransmissions = " << retransmissions
             << std::endl;
 
     // Rate selection
