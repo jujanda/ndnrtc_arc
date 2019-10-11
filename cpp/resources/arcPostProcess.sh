@@ -2,7 +2,7 @@
 
 # Create variables
 echo '> Creating variables'
-PATH_IN="tests"
+PATH_IN="/home/nfd/ndnrtc_arc/cpp/tests"
 PATH_EVALUATION=$1
 SETTING=$2
 RUN=$3
@@ -22,7 +22,7 @@ PATH_RESULTS=$PATH_EVALUATION'setting_'$SETTING/results/$RUN/
 # Delete empty results
 find $PATH_RESULTS -name 'producer-camera_*' -type 'f' -size 0k -delete
 
-# Run analytics
+# Run analytics (single-use operation)
 echo '> Running analytics'
 cd $PATH_RESULTS
 git clone https://github.com/peetonn/ndnrtc-tools &>> arc_PostProcess.log && export PATH=$PATH:$(pwd)/ndnrtc-tools &>> arc_PostProcess.log
@@ -92,6 +92,8 @@ python resources/arcCombineResolutions.py $PATH_RESULTS $LOW_RES_W'x'$LOW_RES_H 
 # # ./run_vmaf format width height reference_path distorted_path [--out-fmt output_format]
 # ./resources/vmaf/run_vmaf yuv420p $LOW_RES_W $LOW_RES_H $PATH_RESULTS/in_$LOW_RES_W'x'$LOW_RES_H'_adjusted'.avi $PATH_RESULTS/producer-camera_padded'_adjusted'.avi --out-fmt json &>> $PATH_RESULTS/arc_PostProcess.log
 # echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+
+echo '> Postprocessing finished!'
 
 # Shortcut for quick results
 echo '> Quick results:'
