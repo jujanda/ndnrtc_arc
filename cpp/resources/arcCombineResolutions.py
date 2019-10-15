@@ -23,7 +23,7 @@ def file_len(fname):
     return i + 1
 
 # Clear directories (DEBUG ONLY)
-os.system("rm -r "+ PATH + "/frames/")
+os.system("rm -r "+ PATH + "frames/")
 
 # Create directories
 os.system("mkdir " + PATH + "frames/")
@@ -39,9 +39,9 @@ for vid in listOfVids:
 	res = tmp.split(".")[1] # 1280x720
 	os.system("ffmpeg -f rawvideo -vcodec rawvideo -s " + res + " -r " + FPS + " -vsync 0 -pix_fmt argb -i " + vid + " " + PATH + "frames/" + num + "/%01d.png")
 	
-	# DEBUG messages
+	# DEBUG message
 	DIR = PATH + "frames/" + num
-	print "Frames in folder: " + str(len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))
+	print "Frames in folder " + str(num) + ": " + str(len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))
 
 
 # Initialize counters
@@ -137,4 +137,21 @@ with open(PATH + "playedFrames.log","r") as input:
 			break;
 
 # Combine frames into viewable video
-os.system("ffmpeg -framerate " + FPS + " -i " + PATH + "frames/combined/%0d.png -c:v libx264 -crf 0 -r " + FPS + " -preset fast -pix_fmt yuv420p " + PATH + "combined.avi")
+# ffmpeg -framerate 24 -i frames/combined/%0d.png -c:v libx264 -crf 0 -s 1280x720 -r 24 -preset fast -pix_fmt yuv420p combined.avi
+os.system("ffmpeg -framerate " + FPS + " -i " + PATH + "frames/combined/%0d.png -c:v libx264 -crf 0 -s " + HIGH_RES + " -r " + FPS + " -preset fast -pix_fmt yuv420p " + PATH + "combined.avi")
+
+print "---------------------------"
+# Save snapshot of directory file numbers (for debugging)
+for vid in listOfVids:
+	# /media/julian/extHD/setting_86/results/0/producer-camera_0.1280x720
+	tmp = vid.split("_")[-1] # 0.1280x720
+	num = tmp.split(".")[0] # 0
+	res = tmp.split(".")[1] # 1280x
+
+	DIR = PATH + "frames/" + num
+	print "Frames in folder " + str(num) + ": " + str(len([name for name in os.listdir(DIR) if os.path.isfile(os.path.join(DIR, name))]))
+
+# Remove frames to save disk space
+os.system("rm -r "+ PATH + "/frames")
+
+
