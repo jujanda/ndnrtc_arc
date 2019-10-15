@@ -217,9 +217,9 @@ LocalStream Client::initLocalStream(const ProducerStreamParams &p)
         videoSource->addCapturer(s.get());
         localStream = s;
 
-#warning double-check whether FPS should be 30
+#warning double-check whether FPS should be 24
         LogDebug("") << "starting video source..." << endl;
-        videoSource->start(30);
+        videoSource->start(24);
         LogDebug("") << "...video source started" << endl;
     }
     else
