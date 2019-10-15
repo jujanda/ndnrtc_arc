@@ -515,16 +515,16 @@ std::string Arc::dashJS() {
 
 
     // Rate selection (yet another DRAFT)
-    if (nextBn > threadSwitchThreshold) {
+    if (nextBn < threadStayThreshold) {
         // switch up
         if (lastThreadToFetch == videoThreads[0].threadName) { return videoThreads[1].threadName; } // low --> med
         else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[2].threadName; } // med --> high
 
-    } else {
+    } else if (nextBn > threadSwitchThreshold) {
         //switch down
         if (lastThreadToFetch == videoThreads[2].threadName) { return videoThreads[1].threadName; } // high --> med
         else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[0].threadName; } // med --> low
-    }
+    } // else: stay the same and dont switch
 
     
 

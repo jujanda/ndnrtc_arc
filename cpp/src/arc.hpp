@@ -73,7 +73,8 @@ class Arc : public ndnrtc::ISegmentControllerObserver,
         std::map<std::string, boost::shared_ptr<NetworkData>> threadsMeta_;
 
         bool metaFetched = false;
-        int threadSwitchThreshold = 20; // in retransmissions
+        int threadStayThreshold = 20; // in retransmissions
+        int threadSwitchThreshold = 40; // in retransmissions
         int minimumThreadTime = 4000; // in ms
         int keyFrameSequenceLength = 4;
         int keyFrameCounter = 0;
