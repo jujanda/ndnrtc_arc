@@ -28,9 +28,9 @@ for setting in settingList:
         lines = file.readlines()
         lineEntries = lines[0].split("\t")
         # runNumber = lineEntries[0]
-        adaption = lineEntries[2]
-        shapingProfile = lineEntries[3]
-        consBandwith = lineEntries[4].strip()
+        adaption = lineEntries[1]
+        shapingProfile = lineEntries[2]
+        consBandwith = lineEntries[3].strip()
 
     runList = [ elem for elem in os.listdir(PATH + setting + "/results/") if "." not in elem]
     # print runList
