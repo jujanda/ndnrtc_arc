@@ -82,7 +82,7 @@ void Arc::calculateThreadToFetch() {
         case AdaptionLogic::NoAdaption: threadToFetch = noAdaption(); break;
         case AdaptionLogic::Random: threadToFetch = randomAdaption(); break;
         case AdaptionLogic::Sequential: threadToFetch = sequentialAdaption(); break;
-        case AdaptionLogic::Dash_JS: threadToFetch = dashJS(); break;
+        case AdaptionLogic::ReTrans: threadToFetch = reTrans(); break;
         case AdaptionLogic::Thang: threadToFetch = thang(); break;
     }
 }
@@ -266,15 +266,15 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             double fullKeyframeTime = now - keyframeSendingtime;
 
             // Calculate throuphut based on total keyframe sending time
-            // dashJS_lastSegmentMeasuredThroughput = sizeSum / fullKeyframeTime; // kbit/s
+            // reTrans_lastSegmentMeasuredThroughput = sizeSum / fullKeyframeTime; // kbit/s
 
             // TODO [Experimental]
-            dashJS_lastSegmentMeasuredThroughput = retransmissions;
+            reTrans_lastSegmentMeasuredThroughput = retransmissions;
 
             // WORKAROUND to dismiss the negative RTT values that pop up occasionally
             // (It shouldn't be needed anymore, but oddly enough, it prevents values from becoming "-nan", so it stays for now)
             if (rtt > 0 && timeSum > 0) {
-                old_dashJS_lastSegmentMeasuredThroughput = sizeSum / timeSum; // kbit/s
+                old_reTrans_lastSegmentMeasuredThroughput = sizeSum / timeSum; // kbit/s
             }
 
             // Log network info to file
@@ -285,13 +285,13 @@ void Arc::segmentArrived(const boost::shared_ptr<WireSegment> & wireSeg) {
             // << ", sizeSum = " << sizeSum << " Bit"
             // << ", timeSum = " << timeSum << " ms"
             << "retransmissions = " << retransmissions
-            << ", oldThroughput = " << old_dashJS_lastSegmentMeasuredThroughput << " kBit/s"
-            << ", newThroughput = " << dashJS_lastSegmentMeasuredThroughput << " kBit/s"
+            << ", oldThroughput = " << old_reTrans_lastSegmentMeasuredThroughput << " kBit/s"
+            << ", newThroughput = " << reTrans_lastSegmentMeasuredThroughput << " kBit/s"
             << std::endl;
 
             // Check for end of keyframe sequence
             if (keyFrameCounter >= keyFrameSequenceLength) { 
-                dashJS_lastSegmentMeasuredThroughput = retransmissions;
+                reTrans_lastSegmentMeasuredThroughput = retransmissions;
                 calculateThreadToFetch();
                 retransmissions = 0;
                 keyFrameCounter = 0;
@@ -427,9 +427,9 @@ std::string Arc::sequentialAdaption() {
     return threadToFetch;
 }
 
-std::string Arc::dashJS() {
-    double bn = dashJS_lastSegmentCalculatedThroughput;
-    double bm = dashJS_lastSegmentMeasuredThroughput;
+std::string Arc::reTrans() {
+    double bn = reTrans_lastSegmentCalculatedThroughput;
+    double bm = reTrans_lastSegmentMeasuredThroughput;
     double w1 = 0.7; // weight 1
     double w2 = 1.3; // weight 2
     int representationBitrate = 0; // bit rate of currently selected representation
@@ -441,7 +441,7 @@ std::string Arc::dashJS() {
     double tmp = (num1 + num2) / den;
     double nextBn = std::floor(tmp);
     // double nextBn = std::floor((num1 + num2) / den); // nextSegmentCalculatedThroughput
-    dashJS_lastSegmentCalculatedThroughput = nextBn;
+    reTrans_lastSegmentCalculatedThroughput = nextBn;
 
     // TODO delete (only used for testing)
     LogInfo("/tmp/arcLog_threadswitches.csv")
@@ -528,7 +528,7 @@ std::string Arc::dashJS() {
 
     
 
-//    std::cout << "dashJS couldn't find a threadToFetch!" << std::endl;
+//    std::cout << "reTrans couldn't find a threadToFetch!" << std::endl;
     return threadToFetch;
 }
 

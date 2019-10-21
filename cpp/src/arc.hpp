@@ -23,7 +23,7 @@ namespace ndnrtc{
         NoAdaption,
         Random,
         Sequential,
-        Dash_JS,
+        ReTrans,
         Thang
     };
 
@@ -84,14 +84,14 @@ class Arc : public ndnrtc::ISegmentControllerObserver,
         double counter = 0; // TODO delete this after debugging
         double counter2 = 0; // TODO delete this after debugging
         double counter3 = 0; // TODO delete this after debugging
-        double dashJS_lastSegmentMeasuredThroughput = 0;
-        double dashJS_lastSegmentCalculatedThroughput = 0;
+        double reTrans_lastSegmentMeasuredThroughput = 0;
+        double reTrans_lastSegmentCalculatedThroughput = 0;
         int videoThreadsOrder [5] = {1,2,0,1,2}; // TODO Delete this after debugging
         std::ofstream segmentTypeVisualisation_file;
         double timeSum = 0;
         double sizeSum = 0;
         double keyframeSendingtime = 0;
-        double old_dashJS_lastSegmentMeasuredThroughput = 0;
+        double old_reTrans_lastSegmentMeasuredThroughput = 0;
         int retransmissions = 0;
 
         // IInterestQueueObserver methods
@@ -130,7 +130,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver,
          * It then goes through the list of available representations from highest to lowest
          * until it finds one that is lower than the calculated bitrate for the next segment.
          */
-        std::string dashJS ();
+        std::string reTrans ();
 
         /**
          *
