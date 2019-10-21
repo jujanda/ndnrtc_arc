@@ -10,6 +10,7 @@ adaption = "[PLACEHOLDER]"
 shapingProfile = "[PLACEHOLDER]"
 consBandwith = "[PLACEHOLDER]"
 framesMissing = "[PLACEHOLDER]"
+retransmissions = "[PLACEHOLDER]"
 psnr = "[PLACEHOLDER]"
 ssim = "[PLACEHOLDER]"
 vmaf = "[PLACEHOLDER]"
@@ -20,6 +21,10 @@ PATH = sys.argv[1]
 # get list of all "setting_x" folders
 settingList = [ elem for elem in os.listdir(PATH) if "setting_" in elem]
 # print settingList
+
+# built headline
+headline = "Setting" + "\t" + "Run" + "\t" + "Adaption" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing" + "\t" + "Retransmissions" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
+data.append(headline)
 
 for setting in settingList:
     settingNumber = setting.split("_")[-1]
@@ -38,9 +43,13 @@ for setting in settingList:
     for run in runList:
         runNumber = run
 
-        with open(PATH + setting + "/results/" + run + "/arc_PostProcess.log","r") as file:
+        with open(PATH + setting + "/results/" + run + "/arcLog_retransmissions.csv","r") as file:
             lines = file.readlines()
-            for line in lines:
+            retransmissions = str(len(lines)-1)
+
+
+        with open(PATH + setting + "/results/" + run + "/arc_PostProcess.log","r") as file:
+            for line in file.readlines():
 
                 # Total frames missing: 133
                 if "Total frames missing:" in line: 
@@ -60,7 +69,7 @@ for setting in settingList:
                     # print "vmaf = "  + vmaf
 
         # construct result entry
-        resultEntry = settingNumber + "\t" + runNumber + "\t" + adaption + "\t" + shapingProfile + "\t" + consBandwith + "\t" + framesMissing + "\t" + psnr + "\t" + ssim + "\t" + vmaf + "\n"
+        resultEntry = settingNumber + "\t" + runNumber + "\t" + adaption + "\t" + shapingProfile + "\t" + consBandwith + "\t" + framesMissing + "\t" + retransmissions + "\t" + psnr + "\t" + ssim + "\t" + vmaf + "\n"
 
         # print resultEntry
 
