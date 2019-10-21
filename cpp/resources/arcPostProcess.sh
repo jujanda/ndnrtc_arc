@@ -89,11 +89,12 @@ echo '> Calculating SSIM'
 ffmpeg -i $PATH_RESULTS/combined.avi -f rawvideo -vcodec rawvideo -s $HIGH_RES_W'x'$HIGH_RES_H -r $FPS -pix_fmt argb -i $PATH_IN/in_1280x720.raw -lavfi  ssim=$PATH_RESULTS/arc_ssim.log -f null - &>> $PATH_RESULTS/arc_PostProcess.log
 echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
-# # FFMPEG, VMAF calculation
-# echo '> Calculating VMAF'
-# # ./run_vmaf format width height reference_path distorted_path [--out-fmt output_format]
-# ./resources/vmaf/run_vmaf yuv420p $LOW_RES_W $LOW_RES_H $PATH_RESULTS/in_$LOW_RES_W'x'$LOW_RES_H'_adjusted'.avi $PATH_RESULTS/producer-camera_padded'_adjusted'.avi --out-fmt json &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+# FFMPEG, VMAF calculation
+echo '> Calculating VMAF'
+# ./run_vmaf format width height reference_path distorted_path [--out-fmt output_format]
+# ./resources/vmaf/run_vmaf yuv420p 1280 720 /home/nfd/ndnrtc_arc/cpp/tests/in_1280x720.raw /media/julian/extHD/setting_87/results/1/combined.avi --out-fmt json
+./resources/vmaf/run_vmaf yuv420p $HIGH_RES_W $HIGH_RES_H $PATH_IN/in_1280x720.raw $PATH_RESULTS/combined.avi --out-fmt json &>> $PATH_RESULTS/arc_PostProcess.log
+echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
 echo '> Postprocessing finished!'
 
