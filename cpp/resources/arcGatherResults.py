@@ -106,7 +106,7 @@ for setting in settingList:
         retransmissions_values.append(int(retransmissions))
         framesMissing_values.append(int(framesMissing))
         psnr_values.append(float(psnr))
-        ssim_values.append(float(psnr))
+        ssim_values.append(float(ssim))
         vmaf_values.append(float(vmaf))
 
     # Construct summary entry
