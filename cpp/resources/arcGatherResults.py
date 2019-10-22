@@ -1,9 +1,15 @@
 import sys
 import fileinput
 import os
+import numpy as np
 
-# initialise variables
+# Extract number from setting string
+def getSettingNumber(tmp):
+    return int(tmp.split("_")[-1])
+
+# Initialise variables
 data = []
+data_means = []
 settingNumber = "[PLACEHOLDER]"
 runNumber = "[PLACEHOLDER]"
 adaption = "[PLACEHOLDER]"
@@ -15,20 +21,31 @@ psnr = "[PLACEHOLDER]"
 ssim = "[PLACEHOLDER]"
 vmaf = "[PLACEHOLDER]"
 
-# save provided file arguments
+# Save provided file arguments
 PATH = sys.argv[1]
 
-# get list of all "setting_x" folders
+# Get list of all "setting_x" folders
 settingList = [ elem for elem in os.listdir(PATH) if "setting_" in elem]
-# print settingList
+settingList.sort(key=getSettingNumber)
 
-# built headline
+# Built & append headline
 headline = "Setting" + "\t" + "Run" + "\t" + "Adaption" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing" + "\t" + "Retransmissions" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
 data.append(headline)
+data_means.append(headline)
+
+print "> Parsing files"
 
 for setting in settingList:
     settingNumber = setting.split("_")[-1]
 
+    # Prepare to store values
+    framesMissing_values = []
+    retransmissions_values = []
+    psnr_values = []
+    ssim_values = []
+    vmaf_values = []
+
+    # Parse setting values
     with open(PATH + setting + "/parameters.txt", "r") as file:
         lines = file.readlines()
         lineEntries = lines[0].split("\t")
@@ -37,17 +54,19 @@ for setting in settingList:
         shapingProfile = lineEntries[2]
         consBandwith = lineEntries[3].strip()
 
+    # Get list of all run folders
     runList = [ elem for elem in os.listdir(PATH + setting + "/results/") if "." not in elem]
     # print runList
 
     for run in runList:
         runNumber = run
 
+        # Parse run values
         with open(PATH + setting + "/results/" + run + "/arcLog_retransmissions.csv","r") as file:
             lines = file.readlines()
             retransmissions = str(len(lines)-1)
 
-
+        # Parse run values
         with open(PATH + setting + "/results/" + run + "/arc_PostProcess.log","r") as file:
             for line in file.readlines():
 
@@ -66,16 +85,50 @@ for setting in settingList:
                 # "VMAF_score": 38.427998305557658, 
                 elif "VMAF_score" in line:
                     vmaf = line.split(" ")[-2][:-1]
-                    # print "vmaf = "  + vmaf
 
-        # construct result entry
-        resultEntry = settingNumber + "\t" + runNumber + "\t" + adaption + "\t" + shapingProfile + "\t" + consBandwith + "\t" + framesMissing + "\t" + retransmissions + "\t" + psnr + "\t" + ssim + "\t" + vmaf + "\n"
+        # Construct result entry
+        resultEntry = []
+        resultEntry.append(settingNumber + "\t") 
+        resultEntry.append(runNumber + "\t") 
+        resultEntry.append(adaption + "\t") 
+        resultEntry.append(shapingProfile + "\t") 
+        resultEntry.append(consBandwith + "\t") 
+        resultEntry.append(framesMissing + "\t") 
+        resultEntry.append(retransmissions + "\t") 
+        resultEntry.append(psnr + "\t") 
+        resultEntry.append(ssim + "\t") 
+        resultEntry.append(vmaf + "\n")
 
-        # print resultEntry
+        # Add line to data
+        data.append("".join(resultEntry))
 
-        # add line to data
-        data.append(resultEntry)
+        # Save values for summary calulations
+        retransmissions_values.append(int(retransmissions))
+        framesMissing_values.append(int(framesMissing))
+        psnr_values.append(float(psnr))
+        ssim_values.append(float(psnr))
+        vmaf_values.append(float(vmaf))
 
-# write data to file
+    # Construct summary entry
+    summary = []
+    summary.append(settingNumber + "\t") 
+    summary.append(str(int(runNumber) + 1) + "\t") 
+    summary.append(adaption + "\t") 
+    summary.append(shapingProfile + "\t") 
+    summary.append(consBandwith + "\t") 
+    summary.append(str(np.mean(np.asarray(framesMissing_values))) + "\t")
+    summary.append(str(np.mean(np.asarray(retransmissions_values))) + "\t")
+    summary.append(str(np.mean(np.asarray(psnr_values))) + "\t")
+    summary.append(str(np.mean(np.asarray(ssim_values))) + "\t")
+    summary.append(str(np.mean(np.asarray(vmaf_values))) + "\n")
+    data_means.append("".join(summary))
+
+print "> Saving results"
+
+# Write normal data to file
 with open(PATH + "run_overview.csv", 'w') as file:
     file.writelines(data)
+
+# Write summary data to file
+with open(PATH + "run_overview_means.csv", 'w') as file:
+    file.writelines(data_means)
