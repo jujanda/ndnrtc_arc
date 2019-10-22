@@ -96,10 +96,13 @@ echo '> Calculating VMAF'
 ./resources/vmaf/run_vmaf yuv420p $HIGH_RES_W $HIGH_RES_H $PATH_IN/in_1280x720.raw $PATH_RESULTS/combined.avi --out-fmt json &>> $PATH_RESULTS/arc_PostProcess.log
 echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
+echo '> Deleting raw files'
+rm -f producer-camera_*
+
 echo '> Postprocessing finished!'
 
 # Shortcut for quick results
-echo '> Quick results:'
-python resources/arcCountMissingFrames.py $PATH_EVALUATION $SETTING $RUN
-python resources/arcThroughput.py $PATH_EVALUATION $SETTING $RUN
-ls -ahl $PATH_RESULTS | grep producer-camera.*
+# echo '> Quick results:'
+# python resources/arcCountMissingFrames.py $PATH_EVALUATION $SETTING $RUN
+# python resources/arcThroughput.py $PATH_EVALUATION $SETTING $RUN
+# ls -ahl $PATH_RESULTS | grep producer-camera.*
