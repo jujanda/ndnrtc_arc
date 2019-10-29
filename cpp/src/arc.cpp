@@ -430,14 +430,12 @@ std::string Arc::sequentialAdaption() {
 std::string Arc::reTrans() {
     double bn = reTrans_lastSegmentCalculatedThroughput;
     double bm = reTrans_lastSegmentMeasuredThroughput;
-    double w1 = 0.7; // weight 1
-    double w2 = 1.3; // weight 2
     int representationBitrate = 0; // bit rate of currently selected representation
 
     // Estimated bitrate calculation:
-    double num1 = bn * w1;
-    double num2 = bm * w2;
-    double den = w1 + w2;
+    double num1 = bn * reTrans_w1;
+    double num2 = bm * reTrans_w2;
+    double den = reTrans_w1 + reTrans_w2;
     double tmp = (num1 + num2) / den;
     double nextBn = std::floor(tmp);
     // double nextBn = std::floor((num1 + num2) / den); // nextSegmentCalculatedThroughput
