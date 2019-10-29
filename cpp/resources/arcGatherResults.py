@@ -16,10 +16,11 @@ adaption = "[PLACEHOLDER]"
 shapingProfile = "[PLACEHOLDER]"
 consBandwith = "[PLACEHOLDER]"
 framesMissing = "[PLACEHOLDER]"
-retransmissions = "[PLACEHOLDER]"
+retransmissions_total = "[PLACEHOLDER]"
 psnr = "[PLACEHOLDER]"
 ssim = "[PLACEHOLDER]"
 vmaf = "[PLACEHOLDER]"
+
 
 # Save provided file arguments
 PATH = sys.argv[1]
@@ -28,15 +29,15 @@ PATH = sys.argv[1]
 settingList = [ elem for elem in os.listdir(PATH) if "setting_" in elem]
 settingList.sort(key=getSettingNumber)
 
-# Built & append headline
-headline = "Setting" + "\t" + "Run" + "\t" + "Adaption" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing" + "\t" + "Retransmissions" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
+# Built & append headlines
+headline = "Setting" + "\t" + "Run" + "\t" + "Adaption" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing" + "\t" + "Retr._max" + "\t" + "Retr._total" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
+headline_means = "Setting" + "\t" + "Run" + "\t" + "Adaption" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing"+ "\t" + "Retransmissions" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
 data.append(headline)
-data_means.append(headline)
+data_means.append(headline_means)
 
 print "> Parsing files"
 
 for setting in settingList:
-    settingNumber = setting.split("_")[-1]
 
     # Prepare to store values
     framesMissing_values = []
@@ -44,6 +45,9 @@ for setting in settingList:
     psnr_values = []
     ssim_values = []
     vmaf_values = []
+
+    # Parse setting number
+    settingNumber = setting.split("_")[-1]
 
     # Parse setting values
     with open(PATH + setting + "/parameters.txt", "r") as file:
@@ -56,15 +60,17 @@ for setting in settingList:
 
     # Get list of all run folders
     runList = [ elem for elem in os.listdir(PATH + setting + "/results/") if "." not in elem]
-    # print runList
 
     for run in runList:
+
+        # Prepare variables
         runNumber = run
+        retransmission_tmp = []
 
         # Parse run values
         with open(PATH + setting + "/results/" + run + "/arcLog_retransmissions.csv","r") as file:
             lines = file.readlines()
-            retransmissions = str(len(lines)-1)
+            retransmissions_total = str(len(lines)-1)
 
         # Parse run values
         with open(PATH + setting + "/results/" + run + "/arc_PostProcess.log","r") as file:
@@ -86,6 +92,13 @@ for setting in settingList:
                 elif "VMAF_score" in line:
                     vmaf = line.split(" ")[-2][:-1]
 
+        # Parse run values
+        with open(PATH + setting + "/results/" + run + "/arcLog_networkMeasurements.csv","r") as file:
+            # Skip first line
+            for line in file.readlines()[1:]:
+                # 1572030662419   [INFO ]: [measured] retransmissions = 103, oldThroughput = 754.379 kBit/s, newThroughput = 103 kBit/s
+                retransmission_tmp.append(int(line.split("=")[1].split(",")[0].strip()))
+
         # Construct result entry
         resultEntry = []
         resultEntry.append(settingNumber + "\t") 
@@ -94,7 +107,8 @@ for setting in settingList:
         resultEntry.append(shapingProfile + "\t") 
         resultEntry.append(consBandwith + "\t") 
         resultEntry.append(framesMissing + "\t") 
-        resultEntry.append(retransmissions + "\t") 
+        resultEntry.append(str(max(retransmission_tmp)) + "\t")
+        resultEntry.append(retransmissions_total + "\t") 
         resultEntry.append(psnr + "\t") 
         resultEntry.append(ssim + "\t") 
         resultEntry.append(vmaf + "\n")
@@ -103,7 +117,7 @@ for setting in settingList:
         data.append("".join(resultEntry))
 
         # Save values for summary calulations
-        retransmissions_values.append(int(retransmissions))
+        retransmissions_values.append(int(retransmissions_total))
         framesMissing_values.append(int(framesMissing))
         psnr_values.append(float(psnr))
         ssim_values.append(float(ssim))
@@ -112,7 +126,7 @@ for setting in settingList:
     # Construct summary entry
     summary = []
     summary.append(settingNumber + "\t") 
-    summary.append(str(int(runNumber) + 1) + "\t") 
+    summary.append(str(len(runList)) + "\t") 
     summary.append(adaption + "\t") 
     summary.append(shapingProfile + "\t") 
     summary.append(consBandwith + "\t") 
