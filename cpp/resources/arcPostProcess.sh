@@ -32,10 +32,6 @@ $PATH_EXECUTE/resources/report-loopback.sh &>> arc_PostProcess.log
 cd $PATH_EXECUTE
 echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
-# # Delete false missing frame entry
-# echo '> Deleting missing frame entry'
-# python resources/arcDeleteMissingFramesEntry.py $PATH_EVALUATION $SETTING $RUN
-
 # Determine missing frames
 echo '> Determining missing frames'
 python resources/arcMissingFrames.py $PATH_RESULTS &>> $PATH_RESULTS/arc_PostProcess.log
@@ -49,33 +45,7 @@ echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.lo
 # Extracting frames of output videos as images and combine them
 echo '> Extracting and combining frames'
 python resources/arcCombineResolutions.py $PATH_RESULTS $LOW_RES_W'x'$LOW_RES_H $MED_RES_W'x'$MED_RES_H $HIGH_RES_W'x'$HIGH_RES_H $FPS &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
-
-# # Transforming .raw file into viewable format
-# echo '> Transforming .raw file into viewable format'
-# ffmpeg -f rawvideo -vcodec rawvideo -s $LOW_RES_W'x'$LOW_RES_H -r $FPS -pix_fmt argb -i $PATH_RESULTS/producer-camera.$LOW_RES_W'x'$LOW_RES_H -c:v libx264 -preset ultrafast -qp 0 $PATH_RESULTS/producer-camera.avi &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
-
-# # Extracting frames of output video as images
-# echo '> Extracting frames of output video as images'
-# ffmpeg -i $PATH_RESULTS/producer-camera.avi $PATH_RESULTS/frames/%01d.png &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
-
-# # Fill in missing frames
-# echo '> Filling in missing frames'
-# OFFSET=`python ./resources/blackFrames.py $LOW_RES_W'x'$LOW_RES_H $FPS`
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
-
-# # Reconstruct video from list of images
-# echo '> Reconstructing video from list of images'
-# ffmpeg -framerate $FPS -i $PATH_RESULTS/frames_padded/%01d.png -c:v libx264 -crf 0 -r $FPS -preset ultrafast -pix_fmt argb $PATH_RESULTS/producer-camera_padded.avi &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
-
-# # Trim original video for fair comparison
-# echo '> Trimming videos for fair comparison'
-# ffmpeg -ss $OFFSET -i $PATH_IN/in_$LOW_RES_W'x'$LOW_RES_H.avi -c:v libx264 $PATH_RESULTS/in_$LOW_RES_W'x'$LOW_RES_H'_adjusted'.avi &>> $PATH_RESULTS/arc_PostProcess.log
-# ffmpeg -ss $OFFSET -i $PATH_RESULTS/producer-camera_padded.avi -c:v libx264 $PATH_RESULTS/producer-camera_padded'_adjusted'.avi &>> $PATH_RESULTS/arc_PostProcess.log
-# echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
+echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
 # FFMPEG, PSNR calculation
 echo '> Calculating PSNR'
@@ -97,7 +67,7 @@ echo '> Calculating VMAF'
 echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
 echo '> Deleting raw files'
-rm -f producer-camera_*
+rm -f $PATH_RESULTS/producer-camera_*
 
 echo '> Postprocessing finished!'
 
