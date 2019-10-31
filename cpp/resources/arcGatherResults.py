@@ -12,6 +12,7 @@ data = []
 data_means = []
 settingNumber = "[PLACEHOLDER]"
 runNumber = "[PLACEHOLDER]"
+initialResolution = "[PLACEHOLDER]"
 adaption = "[PLACEHOLDER]"
 shapingProfile = "[PLACEHOLDER]"
 consBandwith = "[PLACEHOLDER]"
@@ -30,8 +31,8 @@ settingList = [ elem for elem in os.listdir(PATH) if "setting_" in elem]
 settingList.sort(key=getSettingNumber)
 
 # Built & append headlines
-headline = "Setting" + "\t" + "Run" + "\t" + "Adaption" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing" + "\t" + "Retr._max" + "\t" + "Retr._total" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
-headline_means = "Setting" + "\t" + "Run" + "\t" + "Adaption" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing"+ "\t" + "Retransmissions" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
+headline = "Setting" + "\t" + "Run" + "\t" + "Init._Res." + "\t" + "Adaption_Logic" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing" + "\t" + "Retr._max" + "\t" + "Retr._total" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
+headline_means = "Setting" + "\t" + "Run" + "\t" + "Init._Res." + "\t" + "Adaption_Logic" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing"+ "\t" + "Retransmissions" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
 data.append(headline)
 data_means.append(headline_means)
 
@@ -54,7 +55,7 @@ for setting in settingList:
         lines = file.readlines()
         lineEntries = lines[0].split("\t")
         # runNumber = lineEntries[0]
-        adaption = lineEntries[1]
+        initialResolution = lineEntries[1]
         shapingProfile = lineEntries[2]
         consBandwith = lineEntries[3].strip()
 
@@ -71,6 +72,14 @@ for setting in settingList:
         with open(PATH + setting + "/results/" + run + "/arcLog_retransmissions.csv","r") as file:
             lines = file.readlines()
             retransmissions_total = str(len(lines)-1)
+
+        # Parse run values
+        with open(PATH + setting + "/results/" + run + "/src/remote-stream-impl.cpp","r") as file:
+            for line in file.readlines():
+
+                # arc_ = make_shared<Arc>(AdaptionLogic::NoAdaption, this, sstorage_);
+                if "AdaptionLogic::" in line:
+                    adaption = line.split("::")[-1].split(",")[0]
 
         # Parse run values
         with open(PATH + setting + "/results/" + run + "/arc_PostProcess.log","r") as file:
@@ -103,6 +112,7 @@ for setting in settingList:
         resultEntry = []
         resultEntry.append(settingNumber + "\t") 
         resultEntry.append(runNumber + "\t") 
+        resultEntry.append(initialResolution + "\t") 
         resultEntry.append(adaption + "\t") 
         resultEntry.append(shapingProfile + "\t") 
         resultEntry.append(consBandwith + "\t") 
@@ -127,6 +137,7 @@ for setting in settingList:
     summary = []
     summary.append(settingNumber + "\t") 
     summary.append(str(len(runList)) + "\t") 
+    summary.append(initialResolution + "\t") 
     summary.append(adaption + "\t") 
     summary.append(shapingProfile + "\t") 
     summary.append(consBandwith + "\t") 
