@@ -66,7 +66,7 @@ for setting in settingList:
 
         # Prepare variables
         runNumber = run
-        retransmission_tmp = []
+        retransmission_tmp = [0]
 
         # Parse run values
         with open(PATH + setting + "/results/" + run + "/arcLog_retransmissions.csv","r") as file:
@@ -121,7 +121,8 @@ for setting in settingList:
         resultEntry.append(retransmissions_total + "\t") 
         resultEntry.append(psnr + "\t") 
         resultEntry.append(ssim + "\t") 
-        resultEntry.append(vmaf + "\n")
+        resultEntry.append(vmaf + "\t")
+        resultEntry.append("\n")
 
         # Add line to data
         data.append("".join(resultEntry))
@@ -145,7 +146,8 @@ for setting in settingList:
     summary.append(str(np.mean(np.asarray(retransmissions_values))) + "\t")
     summary.append(str(np.mean(np.asarray(psnr_values))) + "\t")
     summary.append(str(np.mean(np.asarray(ssim_values))) + "\t")
-    summary.append(str(np.mean(np.asarray(vmaf_values))) + "\n")
+    summary.append(str(np.mean(np.asarray(vmaf_values))) + "\t")
+    summary.append("\n")
     data_means.append("".join(summary))
 
 print "> Saving results"
