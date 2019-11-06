@@ -68,18 +68,28 @@ for setting in settingList:
         runNumber = run
         retransmission_tmp = [0]
 
-        # Parse run values
+        # Parse run parameters
         with open(PATH + setting + "/results/" + run + "/arcLog_retransmissions.csv","r") as file:
             lines = file.readlines()
             retransmissions_total = str(len(lines)-1)
 
-        # Parse run values
+        # Parse run parameters
         with open(PATH + setting + "/results/" + run + "/src/remote-stream-impl.cpp","r") as file:
             for line in file.readlines():
 
                 # arc_ = make_shared<Arc>(AdaptionLogic::NoAdaption, this, sstorage_);
                 if "AdaptionLogic::" in line:
                     adaption = line.split("::")[-1].split(",")[0]
+
+        # # Parse run parameters
+        # with open(PATH + setting + "/results/" + run + "/src/arc.cpp","r") as file:
+        #     for line in file.readlines():
+
+        #         # arc_ = make_shared<Arc>(AdaptionLogic::NoAdaption, this, sstorage_);
+        #         if "AdaptionLogic::" in line:
+        #             adaption = line.split("::")[-1].split(",")[0]
+
+
 
         # Parse run values
         with open(PATH + setting + "/results/" + run + "/arc_PostProcess.log","r") as file:
