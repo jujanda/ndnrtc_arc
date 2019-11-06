@@ -75,10 +75,10 @@ class Arc : public ndnrtc::ISegmentControllerObserver,
         bool metaFetched = false;
         double reTrans_w1 = 0.7; // weight 1
         double reTrans_w2 = 1.3; // weight 2
-        int threadStayThreshold = 20; // in retransmissions
-        int threadSwitchThreshold = 40; // in retransmissions
-        int keyFrameSequenceLength = 4; // in seconds
-        int minimumThreadTime = 4000; // in ms
+        int lowerThreshold = 20; // in retransmissions
+        int upperThreshold = 40; // in retransmissions
+        int keyFrameSequenceLength = 2; // in seconds
+        int minimumThreadTime = 4000; // in ms [deprecated]
         int keyFrameCounter = 0;
         int gopCounter = 0;
         uint64_t arcStartTime = 0;
@@ -131,6 +131,7 @@ class Arc : public ndnrtc::ISegmentControllerObserver,
          *
          * It then goes through the list of available representations from highest to lowest
          * until it finds one that is lower than the calculated bitrate for the next segment.
+         * TODO rewrite this for retransmissions
          */
         std::string reTrans ();
 

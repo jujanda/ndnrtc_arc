@@ -513,12 +513,12 @@ std::string Arc::reTrans() {
 
 
     // Rate selection (yet another DRAFT)
-    if (nextBn < threadStayThreshold) {
+    if (nextBn < lowerThreshold) {
         // switch up
         if (lastThreadToFetch == videoThreads[0].threadName) { return videoThreads[1].threadName; } // low --> med
         else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[2].threadName; } // med --> high
 
-    } else if (nextBn > threadSwitchThreshold) {
+    } else if (nextBn > upperThreshold) {
         //switch down
         if (lastThreadToFetch == videoThreads[2].threadName) { return videoThreads[1].threadName; } // high --> med
         else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[0].threadName; } // med --> low
