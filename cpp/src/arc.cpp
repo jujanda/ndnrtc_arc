@@ -11,6 +11,8 @@
 #include <frame-data.hpp>
 #include <thread>
 #include <limits>
+#include <fstream>
+#include <algorithm>
 
 using namespace ndnrtc;
 
@@ -20,6 +22,8 @@ Arc::Arc(AdaptionLogic adaptionLogic,
         : selectedAdaptionLogic(adaptionLogic),
           sstorage_(storage)
 {
+    LogInfo("") << "Starting arc module..." << std::endl;
+
     // TODO Threadinfo not delivered in meta data (only names) --> Find solution for that
     videoThread rep1, rep2, rep3;
     rep1.threadName = "low";
@@ -35,11 +39,49 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     arcStartTime = ndn_getNowMilliseconds();
     lastThreadtoFetchChangeTime = ndn_getNowMilliseconds();
 
-    // TODO set initial threadToFetch dynamically from config file | look how remote-stream-impl.cpp handles that
-    threadToFetch = videoThreads.begin()->threadName;
+
+    // Read arc parameters from arc config file
+    // from https://www.walletfox.com/course/parseconfigfile.php
+    // std::ifstream is RAII, i.e. no need to call close
+    LogInfo("") << "Parsing arc parameters..." << std::endl;
+    std::ifstream cFile ("./tests/arcParams.cfg");
+    if (cFile.is_open()) {
+
+        // Go through every line in file
+        std::string line;
+        while(getline(cFile, line)){
+
+            // Remove white space
+            line.erase(std::remove_if(line.begin(), line.end(), isspace), line.end());
+
+            // Ignore comments or empty lines
+            if(line[0] == '#' || line.empty())
+                continue;
+
+            // Split line into name and value
+            auto delimiterPos = line.find("=");
+            auto name = line.substr(0, delimiterPos);
+            auto value = line.substr(delimiterPos + 1);
+
+            // Log parsing result
+            LogInfo("") << " > " << name << ": " << value << std::endl;
+
+            // Assign values to corresponding variables
+            if(name == "reTrans_w1")                 { reTrans_w1 = std::stod(value); }
+            else if(name == "reTrans_w2")            { reTrans_w2 = std::stod(value); }
+            else if(name == "lowerThreshold")        { lowerThreshold = std::stoi(value); }
+            else if(name == "upperThreshold")        { upperThreshold = std::stoi(value); }
+            else if(name == "keyFrameSequenceLength"){ keyFrameSequenceLength = std::stoi(value); }
+            else if(name == "initialResolution")     { threadToFetch = value; }
+        }
+
+    } else {
+        LogInfo("") << "Couldn't open config file for reading." << std::endl;
+    }
+
+    // Initiate further variables
     lastThreadToFetch = threadToFetch;
 
-    // TODO Should store path in variable, ideally from config file
     // Prepare simple-logger
     LogInfo("/tmp/arcLog.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_overtimers.csv") << "[StartTime]\t" << arcStartTime << std::endl;
@@ -49,11 +91,19 @@ Arc::Arc(AdaptionLogic adaptionLogic,
     LogInfo("/tmp/arcLog_producerReceivedInterests.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_producerSentData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_consumerReceivedData.csv") << "[StartTime]\t" << arcStartTime << std::endl;
-    LogInfo("/tmp/arcLog_threadswitches.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_networkMeasurements.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_networkSummedMeasurements.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_networkMeasurementValues.csv") << "[StartTime]\t" << arcStartTime << std::endl;
     LogInfo("/tmp/arcLog_retransmissions.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_params.csv") << "[StartTime]\t" << arcStartTime << std::endl;
+    LogInfo("/tmp/arcLog_threadswitches.csv") << "[StartTime]\t" << arcStartTime 
+        << "\t" << reTrans_w1 
+        << "\t" << reTrans_w2 
+        << "\t" << lowerThreshold 
+        << "\t" << upperThreshold 
+        << "\t" << keyFrameSequenceLength 
+        << "\t" << threadToFetch 
+        << std::endl; 
 }
 
 Arc::~Arc() = default;
@@ -513,12 +563,12 @@ std::string Arc::reTrans() {
 
 
     // Rate selection (yet another DRAFT)
-    if (nextBn < lowerThreshold) {
+    if (nextBn < lowerThreshold * keyFrameSequenceLength) {
         // switch up
         if (lastThreadToFetch == videoThreads[0].threadName) { return videoThreads[1].threadName; } // low --> med
         else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[2].threadName; } // med --> high
 
-    } else if (nextBn > upperThreshold) {
+    } else if (nextBn > upperThreshold * keyFrameSequenceLength) {
         //switch down
         if (lastThreadToFetch == videoThreads[2].threadName) { return videoThreads[1].threadName; } // high --> med
         else if (lastThreadToFetch == videoThreads[1].threadName) { return videoThreads[0].threadName; } // med --> low
