@@ -67,7 +67,7 @@ echo '> Calculating VMAF'
 echo '==================================\n' &>> $PATH_RESULTS/arc_PostProcess.log
 
 # echo '> Deleting raw files'
-# rm -f $PATH_RESULTS/producer-camera_*
+rm -f $PATH_RESULTS/producer-camera_*
 
 echo '>> Postprocessing run '$SETTING' '$RUN' finished! <<'
 
