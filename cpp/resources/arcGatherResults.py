@@ -16,8 +16,13 @@ initialResolution = "[PLACEHOLDER]"
 adaption = "[PLACEHOLDER]"
 shapingProfile = "[PLACEHOLDER]"
 consBandwith = "[PLACEHOLDER]"
+reTrans_w1 = "[PLACEHOLDER]"
+reTrans_w2 = "[PLACEHOLDER]"
+lowerThreshold = "[PLACEHOLDER]"
+upperThreshold = "[PLACEHOLDER]"
+consBandwith = "[PLACEHOLDER]"
 framesMissing = "[PLACEHOLDER]"
-retransmissions_total = "[PLACEHOLDER]"
+keyFrameSequenceLength = "[PLACEHOLDER]"
 psnr = "[PLACEHOLDER]"
 ssim = "[PLACEHOLDER]"
 vmaf = "[PLACEHOLDER]"
@@ -31,12 +36,48 @@ settingList = [ elem for elem in os.listdir(PATH) if "setting_" in elem]
 settingList.sort(key=getSettingNumber)
 
 # Built & append headlines
-headline = "Setting" + "\t" + "Run" + "\t" + "Init._Res." + "\t" + "Adaption_Logic" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing" + "\t" + "Retr._max" + "\t" + "Retr._total" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
-headline_means = "Setting" + "\t" + "Run" + "\t" + "Init._Res." + "\t" + "Adaption_Logic" + "\t" + "Shaping_Profile" + "\t" + "Bandwith(cons)" + "\t" + "Frames_Missing"+ "\t" + "Retransmissions" + "\t" + "PSNR" + "\t" + "SSIM" + "\t" + "VMAF" + "\n"
-data.append(headline)
-data_means.append(headline_means)
+headline = []
+headline.append("Setting")
+headline.append("\t" + "Run")
+headline.append("\t" + "Init._Res.")
+headline.append("\t" + "Adaption_Logic")
+headline.append("\t" + "Shaping_Profile")
+headline.append("\t" + "Bandwith(cons)")
+headline.append("\t" + "AL_w1")
+headline.append("\t" + "AL_w2")
+headline.append("\t" + "AL_th1")
+headline.append("\t" + "AL_th2")
+headline.append("\t" + "AL_seq.len.")
+headline.append("\t" + "Frames_Missing")
+headline.append("\t" + "Retr._max")
+headline.append("\t" + "Retr._total")
+headline.append("\t" + "PSNR")
+headline.append("\t" + "SSIM")
+headline.append("\t" + "VMAF")
+headline.append("\n")
+data.append("".join(headline))
 
-print "> Parsing files"
+headline_means = []
+headline_means.append("Setting")
+headline_means.append("\t" + "Run")
+headline_means.append("\t" + "Init._Res.")
+headline_means.append("\t" + "Adaption_Logic")
+headline_means.append("\t" + "Shaping_Profile")
+headline_means.append("\t" + "Bandwith(cons)")
+headline_means.append("\t" + "AL_w1")
+headline_means.append("\t" + "AL_w2")
+headline_means.append("\t" + "AL_th1")
+headline_means.append("\t" + "AL_th2")
+headline_means.append("\t" + "AL_seq.len.")
+headline_means.append("\t" + "Frames_Missing")
+headline_means.append("\t" + "Retransmissions")
+headline_means.append("\t" + "PSNR")
+headline_means.append("\t" + "SSIM")
+headline_means.append("\t" + "VMAF")
+headline_means.append("\n")
+data_means.append("".join(headline_means))
+
+print("> Parsing files")
 
 for setting in settingList:
 
@@ -49,6 +90,7 @@ for setting in settingList:
 
     # Parse setting number
     settingNumber = setting.split("_")[-1]
+    print("setting " + settingNumber, end =" ") 
 
     # Parse setting values
     with open(PATH + setting + "/parameters.txt", "r") as file:
@@ -81,14 +123,29 @@ for setting in settingList:
                 if "AdaptionLogic::" in line:
                     adaption = line.split("::")[-1].split(",")[0]
 
-        # # Parse run parameters
-        # with open(PATH + setting + "/results/" + run + "/src/arc.cpp","r") as file:
-        #     for line in file.readlines():
+        # Parse run parameters
+        with open(PATH + setting + "/results/" + run + "/tests/arcParams.cfg","r") as file:
+            for line in file.readlines():
 
-        #         # arc_ = make_shared<Arc>(AdaptionLogic::NoAdaption, this, sstorage_);
-        #         if "AdaptionLogic::" in line:
-        #             adaption = line.split("::")[-1].split(",")[0]
+                # reTrans_w1 = 0.7
+                if "reTrans_w1" in line:
+                    reTrans_w1 = line.split("=")[-1].strip()
 
+                # reTrans_w2 = 1.3
+                if "reTrans_w2" in line:
+                    reTrans_w2 = line.split("=")[-1].strip()
+
+                # lowerThreshold = 2
+                if "lowerThreshold" in line:
+                    lowerThreshold = line.split("=")[-1].strip()
+
+                # upperThreshold = 6
+                if "upperThreshold" in line:
+                    upperThreshold = line.split("=")[-1].strip()
+
+                # keyFrameSequenceLength = 3
+                if "keyFrameSequenceLength" in line:
+                    keyFrameSequenceLength = line.split("=")[-1].strip()
 
 
         # Parse run values
@@ -126,6 +183,11 @@ for setting in settingList:
         resultEntry.append(adaption + "\t") 
         resultEntry.append(shapingProfile + "\t") 
         resultEntry.append(consBandwith + "\t") 
+        resultEntry.append(reTrans_w1 + "\t") 
+        resultEntry.append(reTrans_w2 + "\t") 
+        resultEntry.append(lowerThreshold + "\t") 
+        resultEntry.append(upperThreshold + "\t") 
+        resultEntry.append(keyFrameSequenceLength + "\t") 
         resultEntry.append(framesMissing + "\t") 
         resultEntry.append(str(max(retransmission_tmp)) + "\t")
         resultEntry.append(retransmissions_total + "\t") 
@@ -144,14 +206,22 @@ for setting in settingList:
         ssim_values.append(float(ssim))
         vmaf_values.append(float(vmaf))
 
+        print(".", end =" ") 
+
+
     # Construct summary entry
     summary = []
     summary.append(settingNumber + "\t") 
     summary.append(str(len(runList)) + "\t") 
     summary.append(initialResolution + "\t") 
     summary.append(adaption + "\t") 
-    summary.append(shapingProfile + "\t") 
-    summary.append(consBandwith + "\t") 
+    summary.append(shapingProfile + "\t")
+    summary.append(consBandwith + "\t")  
+    summary.append(reTrans_w1 + "\t") 
+    summary.append(reTrans_w2 + "\t") 
+    summary.append(lowerThreshold + "\t") 
+    summary.append(upperThreshold + "\t") 
+    summary.append(keyFrameSequenceLength + "\t") 
     summary.append(str(np.mean(np.asarray(framesMissing_values))) + "\t")
     summary.append(str(np.mean(np.asarray(retransmissions_values))) + "\t")
     summary.append(str(np.mean(np.asarray(psnr_values))) + "\t")
@@ -160,7 +230,9 @@ for setting in settingList:
     summary.append("\n")
     data_means.append("".join(summary))
 
-print "> Saving results"
+    print("done")
+
+print("> Saving results")
 
 # Write normal data to file
 with open(PATH + "run_overview.csv", 'w') as file:
