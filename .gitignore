@@ -84,3 +84,7 @@ cmake-build-debug
 *.avi
 
 cpp/resources/vmaf
+
+cpp/resources/plotting-venv/.ipynb_checkpoints/
+
+cpp/resources/plotting-venv/venv/
